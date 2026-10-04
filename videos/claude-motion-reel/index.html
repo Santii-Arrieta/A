@@ -472,7 +472,7 @@
         left: 50%;
         top: 100%;
         width: 3px;
-        height: 70px;
+        height: var(--stem, 70px);
         margin-left: -1px;
         background: #f2ece1;
       }
@@ -726,7 +726,7 @@
       id="root"
       data-composition-id="main"
       data-start="0"
-      data-duration="15"
+      data-duration="10"
       data-width="1920"
       data-height="1080"
     >
@@ -801,7 +801,7 @@
           <div id="s4-sub" class="mono">Every single one placed on purpose.</div>
         </div>
         <div id="s4-chart" class="mono">
-          <div class="chart-title" id="s4-title">THIS REEL · SHOT LENGTHS (S)</div>
+          <div class="chart-title" id="s4-title">THIS REEL · GSAP TWEENS PER SCENE</div>
           <div class="bars" id="s4-bars"></div>
           <div id="s4-base"></div>
         </div>
@@ -838,7 +838,7 @@
         <div class="ch ch-tl"><span class="ch-dot"></span>CLAUDE <span class="dim">/ MOTION REEL 2026</span></div>
         <div class="ch ch-tr" id="ch-tc">TC 00:00:00:00</div>
         <div class="ch ch-bl" id="ch-scene">01 — KINETIC TYPE</div>
-        <div class="ch ch-br">1920×1080 · 30 FPS · 15 S</div>
+        <div class="ch ch-br">1920×1080 · 30 FPS · 10 S</div>
         <div class="ch-rail" id="ch-rail"><div id="ch-fill"></div></div>
       </div>
 
@@ -846,12 +846,29 @@
       <div id="wipe-a" class="wipe"></div>
       <div id="wipe-b" class="wipe"></div>
       <div id="flash"></div>
+
+      <!-- Pre-mixed soundtrack: synthesized 144 BPM bed + bundled SFX hits (scripts/make_audio.py) -->
+      <audio
+        id="reel-audio"
+        src="assets/audio/reel-mix.wav"
+        data-start="0"
+        data-duration="10"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
     </div>
 
     <script>
+      // Motion is authored on `tl` in source seconds (the original 15 s cut). The registered
+      // `master` timeline plays it in 10 s through a piecewise-linear time warp that lands
+      // every scene cut on a bar line at 144 BPM (6 scenes × 1 bar = 10 s).
       const tl = gsap.timeline({ paused: true });
-      const DURATION = 15;
+      const master = gsap.timeline({ paused: true });
+      const SRC_DURATION = 15;
+      const DURATION = 10;
       const FPS = 30;
+      const BPM = 144;
+      const BAR = 240 / BPM;
 
       // Pure hash: deterministic "random" from an integer (no Math.random).
       const hash = (n) => {
@@ -868,13 +885,25 @@
         { at: 10.85, label: "05 — CAMERA" },
         { at: 13.2, label: "06 — SIGNATURE" },
       ];
+      // Warp knots: source scene swaps → bar lines in output time.
+      const SRC_KNOTS = [...SCENES.map((sc) => sc.at), SRC_DURATION];
+      const OUT_KNOTS = SRC_KNOTS.map((_, i) => i * BAR);
+      const warp = (u) => {
+        for (let i = 0; i < OUT_KNOTS.length - 1; i++) {
+          if (u <= OUT_KNOTS[i + 1] || i === OUT_KNOTS.length - 2) {
+            const k = (u - OUT_KNOTS[i]) / (OUT_KNOTS[i + 1] - OUT_KNOTS[i]);
+            return SRC_KNOTS[i] + k * (SRC_KNOTS[i + 1] - SRC_KNOTS[i]);
+          }
+        }
+        return SRC_DURATION;
+      };
 
       /* ═════════ Reel chrome ═════════ */
       const rail = document.getElementById("ch-rail");
-      SCENES.slice(1).forEach((s) => {
+      OUT_KNOTS.slice(1, -1).forEach((at) => {
         const tick = document.createElement("div");
         tick.className = "ch-tick";
-        tick.style.left = `${(s.at / DURATION) * 100}%`;
+        tick.style.left = `${(at / DURATION) * 100}%`;
         rail.appendChild(tick);
       });
       const tcEl = document.getElementById("ch-tc");
@@ -889,8 +918,8 @@
         const s = Math.floor(f / FPS);
         tcEl.textContent = `TC 00:00:${pad(s)}:${pad(f % FPS)}`;
         let label = SCENES[0].label;
-        SCENES.forEach((sc) => {
-          if (t >= sc.at) label = sc.label;
+        SCENES.forEach((sc, i) => {
+          if (t >= OUT_KNOTS[i]) label = sc.label;
         });
         if (label !== lastLabel) {
           sceneEl.textContent = label;
@@ -904,8 +933,9 @@
         });
       };
       writeChrome();
-      tl.fromTo(clock, { t: 0 }, { t: DURATION, duration: DURATION, ease: "none", onUpdate: writeChrome }, 0);
-      tl.fromTo("#ch-fill", { scaleX: 0 }, { scaleX: 1, duration: DURATION, ease: "none" }, 0);
+      // Timecode, rail and grain run in real output time on the master timeline.
+      master.fromTo(clock, { t: 0 }, { t: DURATION, duration: DURATION, ease: "none", onUpdate: writeChrome }, 0);
+      master.fromTo("#ch-fill", { scaleX: 0 }, { scaleX: 1, duration: DURATION, ease: "none" }, 0);
       tl.fromTo(".ch-tl, .ch-tr", { y: -40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out", stagger: 0.08 }, 0.05);
       tl.fromTo(".ch-bl, .ch-br, .ch-rail", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out", stagger: 0.06 }, 0.15);
 
@@ -933,7 +963,7 @@
             duration: dur,
             ease: "power3.in",
             onUpdate: () => {
-              const step = Math.floor(tl.time() / (1 / 20));
+              const step = Math.floor(tl.time() / (1 / 12));
               glitchCopies.forEach((el, layer) => {
                 const jx = (hash(step * 13 + layer * 7) * 2 - 1) * maxSplit * amp.a;
                 const jy = (hash(step * 29 + layer * 11) * 2 - 1) * maxSplit * 0.35 * amp.a;
@@ -1107,17 +1137,17 @@
 
       /* ═════════ 04 — DATA (counting-dynamic-scale + stat-bars-and-fills) ═════════ */
       const S4 = 8.45;
-      const lengths = SCENES.map((s, i) => (i < SCENES.length - 1 ? SCENES[i + 1].at : DURATION) - s.at);
-      const maxLen = Math.max(...lengths);
+      // Bars = real GSAP tween count per scene; heights/values are filled in once the
+      // whole timeline exists (see the end of this script).
       const barsEl = document.getElementById("s4-bars");
-      lengths.forEach((len, i) => {
+      SCENES.forEach((_, i) => {
         const col = document.createElement("div");
         col.className = "bar-col";
         const here = i === 3;
-        const barH = Math.round((len / maxLen) * 380);
+        const barH = 0;
         col.innerHTML =
           (here ? `<div id="s4-pin" style="bottom:450px">YOU ARE HERE</div>` : "") +
-          `<span class="bar-val">${len.toFixed(2)}</span>` +
+          `<span class="bar-val">0</span>` +
           `<div class="bar${here ? " is-here" : ""}" style="height:${barH}px"></div>` +
           `<span class="bar-name">0${i + 1}</span>`;
         barsEl.appendChild(col);
@@ -1247,7 +1277,35 @@
         UNDER_AT + 0.25,
       );
 
-      window.__timelines["main"] = tl;
+      // Fill the data scene with the real per-scene tween count (build time, before registering).
+      const counts = SCENES.map(() => 0);
+      tl.getChildren(false, true, false).forEach((tw) => {
+        const at = tw.startTime();
+        let idx = 0;
+        SCENES.forEach((sc, i) => {
+          if (at >= sc.at) idx = i;
+        });
+        counts[idx] += 1;
+      });
+      const maxCount = Math.max(...counts);
+      Array.from(barsEl.children).forEach((col, i) => {
+        col.querySelector(".bar").style.height = `${Math.round((counts[i] / maxCount) * 380)}px`;
+        col.querySelector(".bar-val").textContent = String(counts[i]);
+        const pin = col.querySelector("#s4-pin");
+        // stem reaches down to just above this bar's value label (pin sits at bottom: 450px)
+        if (pin) pin.style.setProperty("--stem", `${450 - Math.round((counts[i] / maxCount) * 380) - 92}px`);
+      });
+
+      // Play the source-time timeline through the warp, in real output time.
+      const playhead = { u: 0 };
+      master.fromTo(
+        playhead,
+        { u: 0 },
+        { u: DURATION, duration: DURATION, ease: "none", onUpdate: () => tl.time(warp(playhead.u)) },
+        0,
+      );
+      tl.time(0);
+      window.__timelines["main"] = master;
     </script>
   </body>
 </html>
