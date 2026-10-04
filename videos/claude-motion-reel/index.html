@@ -1,0 +1,1253 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <!-- GSAP vendored from npm: cdn.jsdelivr.net is blocked in this environment -->
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #0f0d0b;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #0f0d0b;
+        color: #f2ece1;
+        font-family: "JetBrains Mono", monospace;
+      }
+      .scene {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #0f0d0b;
+      }
+      #s1 {
+        z-index: 1;
+      }
+      #s2,
+      #s3,
+      #s4,
+      #s5,
+      #s6 {
+        opacity: 0;
+      }
+      #s2 {
+        z-index: 2;
+      }
+      #s3 {
+        z-index: 3;
+      }
+      #s4 {
+        z-index: 4;
+      }
+      #s5 {
+        z-index: 5;
+        background: #120f0c;
+      }
+      #s6 {
+        z-index: 6;
+      }
+      .display {
+        font-family: "League Gothic", sans-serif;
+        font-weight: 400;
+        text-transform: uppercase;
+      }
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+      }
+      .accent {
+        color: #ff4a1c;
+      }
+      .glow {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 74, 28, 0.42) 0%, rgba(255, 74, 28, 0) 68%);
+        pointer-events: none;
+      }
+
+      /* ── Scene 1 — kinetic type ─────────────────────────── */
+      #s1-glow {
+        width: 1300px;
+        height: 1300px;
+        right: -380px;
+        top: -160px;
+      }
+      #s1-ghost {
+        position: absolute;
+        right: 120px;
+        top: 40px;
+        font-size: 1000px;
+        line-height: 1;
+        color: rgba(255, 74, 28, 0);
+        -webkit-text-stroke: 3px rgba(255, 74, 28, 0.32);
+      }
+      .kbs-stage {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 150px 160px;
+      }
+      .kbs-line {
+        display: block;
+        font-size: 270px;
+        line-height: 0.84;
+        letter-spacing: 0.01em;
+        color: #f2ece1;
+        transform-origin: left center;
+      }
+      .glitch-stack {
+        display: grid;
+      }
+      .glitch-base,
+      .glitch-copy {
+        grid-area: 1 / 1;
+      }
+      .glitch-base {
+        z-index: 2;
+        color: #ff4a1c;
+      }
+      .glitch-copy {
+        z-index: 1;
+        opacity: 0;
+        mix-blend-mode: screen;
+        will-change: transform;
+      }
+      .glitch-copy.warm {
+        color: #ffd84a;
+      }
+      .glitch-copy.cool {
+        color: #4d7cff;
+      }
+      #s1-under {
+        display: block;
+        width: 560px;
+        height: 16px;
+        margin-top: 34px;
+        background: #ff4a1c;
+        transform-origin: left center;
+      }
+      .metronome {
+        position: absolute;
+        right: 160px;
+        bottom: 150px;
+        display: flex;
+        gap: 14px;
+      }
+      .metronome i {
+        display: block;
+        width: 8px;
+        height: 40px;
+        background: #ff4a1c;
+        opacity: 0.25;
+      }
+
+      /* ── Scene 2 — depth ────────────────────────────────── */
+      .floor-wrap {
+        position: absolute;
+        inset: 0;
+        perspective: 900px;
+        overflow: hidden;
+      }
+      #s2-floor {
+        position: absolute;
+        left: -50%;
+        width: 200%;
+        top: 56%;
+        height: 120%;
+        transform-origin: 50% 0;
+        transform: rotateX(74deg);
+        background-image:
+          linear-gradient(rgba(255, 74, 28, 0.34) 3px, rgba(255, 74, 28, 0) 3px),
+          linear-gradient(90deg, rgba(255, 74, 28, 0.34) 3px, rgba(255, 74, 28, 0) 3px);
+        background-size: 120px 120px;
+        -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 40%);
+        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 40%);
+      }
+      #s2-glow {
+        width: 1400px;
+        height: 900px;
+        left: 260px;
+        top: 120px;
+      }
+      .cloud-root {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        perspective: 1400px;
+        padding-bottom: 80px;
+      }
+      #s2-cloud {
+        display: flex;
+        gap: 10px;
+        transform-style: preserve-3d;
+        will-change: transform;
+      }
+      .frag {
+        display: block;
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+        will-change: transform, opacity;
+        opacity: 0;
+      }
+      .depth-stack {
+        position: relative;
+      }
+      .depth-text {
+        display: block;
+        font-family: "Archivo Black", sans-serif;
+        font-weight: 400;
+        font-size: 330px;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        color: #ff4a1c;
+      }
+      .depth-text.is-back {
+        position: absolute;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+      }
+      .depth-text.is-front {
+        position: relative;
+        z-index: 10;
+      }
+      #s2-meta {
+        position: absolute;
+        left: 160px;
+        bottom: 150px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        font-size: 26px;
+        color: #c9bfae;
+      }
+      #s2-meta div {
+        opacity: 0;
+      }
+      #s2-meta b {
+        color: #ff4a1c;
+        font-weight: 700;
+      }
+
+      /* ── Scene 3 — easing ───────────────────────────────── */
+      #s3-panel {
+        position: absolute;
+        left: 160px;
+        top: 160px;
+        width: 600px;
+        padding: 30px;
+        background: #1a1714;
+        border: 3px solid #3a332c;
+        border-radius: 20px;
+      }
+      .panel-head {
+        display: flex;
+        justify-content: space-between;
+        font-size: 24px;
+        color: #c9bfae;
+        margin-bottom: 18px;
+      }
+      .panel-head span {
+        color: #ff4a1c;
+        font-weight: 700;
+      }
+      #s3-svg {
+        display: block;
+        width: 536px;
+        height: 440px;
+      }
+      #s3-svg .gridline {
+        stroke: #2e2924;
+        stroke-width: 2;
+      }
+      #s3-diag {
+        fill: none;
+        stroke: #6b6156;
+        stroke-width: 3;
+        stroke-dasharray: 10 10;
+      }
+      #s3-curve {
+        fill: none;
+        stroke: #ff4a1c;
+        stroke-width: 8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      #s3-dot {
+        fill: #f2ece1;
+        stroke: #ff4a1c;
+        stroke-width: 5;
+      }
+      .readout {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 18px;
+        font-size: 28px;
+        font-variant-numeric: tabular-nums;
+        color: #f2ece1;
+      }
+      #s3-head {
+        position: absolute;
+        right: 160px;
+        top: 210px;
+        text-align: right;
+        font-size: 236px;
+        line-height: 0.86;
+      }
+      #s3-head div {
+        display: block;
+      }
+      #s3-track {
+        position: absolute;
+        left: 160px;
+        right: 160px;
+        top: 852px;
+        height: 64px;
+      }
+      #s3-line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 30px;
+        height: 4px;
+        background: #3a332c;
+        transform-origin: left center;
+      }
+      .ghost-puck {
+        position: absolute;
+        top: 0;
+        width: 64px;
+        height: 64px;
+        border: 3px solid rgba(255, 74, 28, 0.7);
+        border-radius: 12px;
+        opacity: 0;
+      }
+      #s3-puck {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        background: #ff4a1c;
+      }
+
+      /* ── Scene 4 — data ─────────────────────────────────── */
+      #s4-glow {
+        width: 1200px;
+        height: 1200px;
+        left: -360px;
+        top: -80px;
+      }
+      #s4-left {
+        position: absolute;
+        left: 160px;
+        top: 170px;
+        width: 760px;
+      }
+      .counter-wrap {
+        width: 760px;
+        height: 330px;
+        display: flex;
+        align-items: flex-end;
+      }
+      #s4-count {
+        display: inline-block;
+        font-family: "Archivo Black", sans-serif;
+        font-size: 300px;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        color: #ff4a1c;
+        transform-origin: left bottom;
+      }
+      #s4-label {
+        display: block;
+        font-size: 150px;
+        line-height: 0.9;
+        margin-top: 10px;
+      }
+      #s4-sub {
+        display: block;
+        font-size: 30px;
+        color: #c9bfae;
+        margin-top: 28px;
+      }
+      #s4-chart {
+        position: absolute;
+        right: 160px;
+        top: 200px;
+        width: 760px;
+        height: 640px;
+      }
+      .chart-title {
+        font-size: 24px;
+        color: #c9bfae;
+        letter-spacing: 0.08em;
+      }
+      .bars {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 60px;
+        height: 480px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+      }
+      .bar-col {
+        position: relative;
+        width: 96px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+      }
+      .bar-val {
+        display: block;
+        font-size: 26px;
+        margin-bottom: 12px;
+        color: #f2ece1;
+        opacity: 0;
+      }
+      .bar {
+        display: block;
+        width: 96px;
+        background: #4a4138;
+        border-radius: 8px 8px 0 0;
+        transform-origin: bottom center;
+      }
+      .bar.is-here {
+        background: #ff4a1c;
+      }
+      .bar-name {
+        position: absolute;
+        bottom: -48px;
+        font-size: 24px;
+        color: #c9bfae;
+      }
+      #s4-base {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 58px;
+        height: 4px;
+        background: #6b6156;
+        transform-origin: left center;
+      }
+      #s4-pin {
+        position: absolute;
+        padding: 8px 16px;
+        background: #f2ece1;
+        color: #0f0d0b;
+        font-size: 22px;
+        font-weight: 700;
+        border-radius: 8px;
+        white-space: nowrap;
+        opacity: 0;
+      }
+      #s4-pin::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 100%;
+        width: 3px;
+        height: 70px;
+        margin-left: -1px;
+        background: #f2ece1;
+      }
+
+      /* ── Scene 5 — camera ───────────────────────────────── */
+      #s5-glow {
+        width: 1800px;
+        height: 1200px;
+        left: 60px;
+        top: -60px;
+      }
+      #s5-stage {
+        position: absolute;
+        inset: 0;
+        perspective: 1000px;
+      }
+      #s5-world {
+        position: absolute;
+        inset: 0;
+        transform-style: preserve-3d;
+        transform-origin: 50% 50%;
+        will-change: transform;
+      }
+      .tile-grid {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 1640px;
+        height: 800px;
+        margin-left: -820px;
+        margin-top: -400px;
+        display: grid;
+        grid-template-columns: repeat(4, 380px);
+        grid-template-rows: repeat(3, 240px);
+        gap: 40px;
+        transform-style: preserve-3d;
+      }
+      .tile {
+        --dof: 0px;
+        filter: blur(var(--dof));
+        will-change: filter;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 26px 30px;
+        background: #1c1915;
+        border: 3px solid #3a332c;
+        border-radius: 18px;
+      }
+      .tile-n {
+        font-size: 24px;
+        color: #ff4a1c;
+        font-weight: 700;
+      }
+      .tile-name {
+        font-size: 80px;
+        line-height: 0.9;
+        color: #f2ece1;
+      }
+      .tile.is-hero {
+        background: #ff4a1c;
+        border-color: #ff4a1c;
+      }
+      .tile.is-hero .tile-n,
+      .tile.is-hero .tile-name {
+        color: #140f0b;
+      }
+      .tile-sub {
+        font-size: 22px;
+        color: #140f0b;
+        font-weight: 700;
+        opacity: 0;
+      }
+
+      /* ── Scene 6 — signature lockup ─────────────────────── */
+      #s6-glow {
+        width: 1500px;
+        height: 1000px;
+        left: 210px;
+        top: 20px;
+      }
+      .lockup {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding-bottom: 40px;
+      }
+      #s6-word {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        font-size: 400px;
+        line-height: 0.86;
+        letter-spacing: 0.02em;
+      }
+      .ltr {
+        display: block;
+        opacity: 0;
+      }
+      .under-wrap {
+        position: relative;
+        width: 700px;
+        height: 14px;
+        margin-top: 26px;
+      }
+      #s6-under {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: #ff4a1c;
+        transform-origin: center center;
+      }
+      #s6-pf {
+        position: absolute;
+        z-index: 1;
+        left: 50%;
+        top: 0;
+        width: 0;
+        height: 0;
+      }
+      .particle {
+        position: absolute;
+        left: 0;
+        top: 0;
+        border-radius: 2px;
+        opacity: 0;
+        will-change: transform, opacity;
+      }
+      #s6-sub {
+        display: block;
+        margin-top: 40px;
+        font-size: 28px;
+        letter-spacing: 0.14em;
+        color: #c9bfae;
+      }
+
+      /* ── Reel chrome, transitions, grain ────────────────── */
+      #chrome {
+        position: absolute;
+        inset: 0;
+        z-index: 60;
+        pointer-events: none;
+        font-size: 22px;
+        letter-spacing: 0.06em;
+        color: #c9bfae;
+      }
+      .ch {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .ch-tl {
+        top: 50px;
+        left: 64px;
+        color: #f2ece1;
+        font-weight: 700;
+      }
+      .ch-tl .dim {
+        color: #c9bfae;
+        font-weight: 400;
+      }
+      .ch-dot {
+        display: block;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #ff4a1c;
+      }
+      .ch-tr {
+        top: 50px;
+        right: 64px;
+        font-variant-numeric: tabular-nums;
+      }
+      .ch-bl {
+        bottom: 58px;
+        left: 64px;
+        color: #f2ece1;
+      }
+      .ch-br {
+        bottom: 58px;
+        right: 64px;
+      }
+      .ch-rail {
+        position: absolute;
+        left: 64px;
+        right: 64px;
+        bottom: 32px;
+        height: 4px;
+        background: #2e2924;
+      }
+      #ch-fill {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: #ff4a1c;
+        transform-origin: left center;
+      }
+      .ch-tick {
+        position: absolute;
+        top: -6px;
+        width: 3px;
+        height: 16px;
+        background: #6b6156;
+      }
+      .wipe {
+        position: absolute;
+        top: 0;
+        left: -1920px;
+        width: 1920px;
+        height: 1080px;
+        z-index: 150;
+      }
+      #wipe-a {
+        background: #f2ece1;
+      }
+      #wipe-b {
+        background: #ff4a1c;
+      }
+      #flash {
+        position: absolute;
+        inset: 0;
+        z-index: 160;
+        background: #fff4e8;
+        opacity: 0;
+      }
+      #grain {
+        position: absolute;
+        inset: 0;
+        z-index: 120;
+        pointer-events: none;
+        overflow: hidden;
+        mix-blend-mode: overlay;
+      }
+      #grain .grain-texture {
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        opacity: 0.32;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="15"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- 01 — KINETIC TYPE -->
+      <div id="s1" class="scene">
+        <div id="s1-glow" class="glow"></div>
+        <div id="s1-ghost" class="display" aria-hidden="true" data-layout-ignore>01</div>
+        <div class="kbs-stage" id="s1-stage">
+          <div class="kbs-line display" id="p1">Motion</div>
+          <div class="kbs-line display" id="p2" data-layout-allow-overlap>is a</div>
+          <div class="kbs-line display glitch-stack" id="p3" data-layout-allow-overlap>
+            <span class="glitch-copy warm" aria-hidden="true" data-layout-ignore>Language.</span>
+            <span class="glitch-copy cool" aria-hidden="true" data-layout-ignore>Language.</span>
+            <span class="glitch-base">Language.</span>
+          </div>
+          <div id="s1-under"></div>
+        </div>
+        <div class="metronome" id="s1-metro">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+      </div>
+
+      <!-- 02 — 3D DEPTH -->
+      <div id="s2" class="scene">
+        <div class="floor-wrap"><div id="s2-floor"></div></div>
+        <div id="s2-glow" class="glow"></div>
+        <div class="cloud-root">
+          <div id="s2-cloud">
+            <div class="frag"><div class="depth-stack" data-glyph="D"></div></div>
+            <div class="frag"><div class="depth-stack" data-glyph="E"></div></div>
+            <div class="frag"><div class="depth-stack" data-glyph="P"></div></div>
+            <div class="frag"><div class="depth-stack" data-glyph="T"></div></div>
+            <div class="frag"><div class="depth-stack" data-glyph="H"></div></div>
+          </div>
+        </div>
+        <div id="s2-meta" class="mono">
+          <div><b>translateZ</b>(−480px → 0)</div>
+          <div><b>scatter</b> · golden-angle · 5 glyphs</div>
+          <div><b>extrude</b> · 6 layers · 1 timeline</div>
+        </div>
+      </div>
+
+      <!-- 03 — EASING -->
+      <div id="s3" class="scene">
+        <div id="s3-panel" class="mono">
+          <div class="panel-head">ease.curve<span>expo.out</span></div>
+          <svg id="s3-svg" viewBox="0 0 536 440" xmlns="http://www.w3.org/2000/svg">
+            <g id="s3-grid"></g>
+            <path id="s3-diag" d="M 20 420 L 516 20" />
+            <path id="s3-curve" d="M 20 420" />
+            <circle id="s3-dot" cx="20" cy="420" r="13" />
+          </svg>
+          <div class="readout"><span id="s3-t">t 0.00</span><span id="s3-p">p 0.00</span></div>
+        </div>
+        <div id="s3-head" class="display">
+          <div id="s3-h1">Ease is</div>
+          <div id="s3-h2" class="accent">Emotion.</div>
+        </div>
+        <div id="s3-track">
+          <div id="s3-line"></div>
+          <div id="s3-ghosts"></div>
+          <div id="s3-puck"></div>
+        </div>
+      </div>
+
+      <!-- 04 — DATA IN MOTION -->
+      <div id="s4" class="scene">
+        <div id="s4-glow" class="glow"></div>
+        <div id="s4-left">
+          <div class="counter-wrap"><span id="s4-count">0</span></div>
+          <div id="s4-label" class="display">Frames.</div>
+          <div id="s4-sub" class="mono">Every single one placed on purpose.</div>
+        </div>
+        <div id="s4-chart" class="mono">
+          <div class="chart-title" id="s4-title">THIS REEL · SHOT LENGTHS (S)</div>
+          <div class="bars" id="s4-bars"></div>
+          <div id="s4-base"></div>
+        </div>
+      </div>
+
+      <!-- 05 — CAMERA -->
+      <div id="s5" class="scene">
+        <div id="s5-glow" class="glow"></div>
+        <div id="s5-stage">
+          <div id="s5-world" data-layout-allow-overflow>
+            <div class="tile-grid" id="s5-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 06 — SIGNATURE -->
+      <div id="s6" class="scene">
+        <div id="s6-glow" class="glow"></div>
+        <div class="lockup">
+          <div id="s6-word" class="display">
+            <span class="ltr">C</span><span class="ltr">L</span><span class="ltr">A</span
+            ><span class="ltr">U</span><span class="ltr">D</span><span class="ltr">E</span>
+          </div>
+          <div class="under-wrap">
+            <div id="s6-pf"></div>
+            <div id="s6-under"></div>
+          </div>
+          <div id="s6-sub" class="mono">MOTION DESIGNER · BUILT IN HTML · RENDERED FRAME BY FRAME</div>
+        </div>
+      </div>
+
+      <!-- Reel chrome (persists over every scene) -->
+      <div id="chrome" class="mono">
+        <div class="ch ch-tl"><span class="ch-dot"></span>CLAUDE <span class="dim">/ MOTION REEL 2026</span></div>
+        <div class="ch ch-tr" id="ch-tc">TC 00:00:00:00</div>
+        <div class="ch ch-bl" id="ch-scene">01 — KINETIC TYPE</div>
+        <div class="ch ch-br">1920×1080 · 30 FPS · 15 S</div>
+        <div class="ch-rail" id="ch-rail"><div id="ch-fill"></div></div>
+      </div>
+
+      <div id="grain" data-layout-ignore><div class="grain-texture"></div></div>
+      <div id="wipe-a" class="wipe"></div>
+      <div id="wipe-b" class="wipe"></div>
+      <div id="flash"></div>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const DURATION = 15;
+      const FPS = 30;
+
+      // Pure hash: deterministic "random" from an integer (no Math.random).
+      const hash = (n) => {
+        const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+        return x - Math.floor(x);
+      };
+
+      // Scene swap times (when each scene owns the frame) — shared by chrome + data scene.
+      const SCENES = [
+        { at: 0.0, label: "01 — KINETIC TYPE" },
+        { at: 2.85, label: "02 — 3D DEPTH" },
+        { at: 5.75, label: "03 — EASING" },
+        { at: 8.45, label: "04 — DATA IN MOTION" },
+        { at: 10.85, label: "05 — CAMERA" },
+        { at: 13.2, label: "06 — SIGNATURE" },
+      ];
+
+      /* ═════════ Reel chrome ═════════ */
+      const rail = document.getElementById("ch-rail");
+      SCENES.slice(1).forEach((s) => {
+        const tick = document.createElement("div");
+        tick.className = "ch-tick";
+        tick.style.left = `${(s.at / DURATION) * 100}%`;
+        rail.appendChild(tick);
+      });
+      const tcEl = document.getElementById("ch-tc");
+      const sceneEl = document.getElementById("ch-scene");
+      const grainTex = document.querySelector("#grain .grain-texture");
+      const pad = (n) => String(n).padStart(2, "0");
+      let lastLabel = "";
+      const clock = { t: 0 };
+      const writeChrome = () => {
+        const t = clock.t;
+        const f = Math.min(DURATION * FPS - 1, Math.round(t * FPS));
+        const s = Math.floor(f / FPS);
+        tcEl.textContent = `TC 00:00:${pad(s)}:${pad(f % FPS)}`;
+        let label = SCENES[0].label;
+        SCENES.forEach((sc) => {
+          if (t >= sc.at) label = sc.label;
+        });
+        if (label !== lastLabel) {
+          sceneEl.textContent = label;
+          lastLabel = label;
+        }
+        // Grain jumps every 2 frames to a hashed offset — quantized, seek-safe.
+        const step = Math.floor(t * 15);
+        gsap.set(grainTex, {
+          xPercent: (hash(step * 3 + 1) * 2 - 1) * 12,
+          yPercent: (hash(step * 7 + 2) * 2 - 1) * 12,
+        });
+      };
+      writeChrome();
+      tl.fromTo(clock, { t: 0 }, { t: DURATION, duration: DURATION, ease: "none", onUpdate: writeChrome }, 0);
+      tl.fromTo("#ch-fill", { scaleX: 0 }, { scaleX: 1, duration: DURATION, ease: "none" }, 0);
+      tl.fromTo(".ch-tl, .ch-tr", { y: -40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out", stagger: 0.08 }, 0.05);
+      tl.fromTo(".ch-bl, .ch-br, .ch-rail", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out", stagger: 0.06 }, 0.15);
+
+      /* ═════════ 01 — KINETIC TYPE (kinetic-beat-slam + chromatic-glitch) ═════════ */
+      const PULSE = 0.3;
+      const BEATS = [0.15, 0.75, 1.35];
+      tl.fromTo("#s1-glow", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.9, ease: "power2.out" }, 0.05);
+      tl.to("#s1-glow", { scale: 1.08, duration: 0.9, ease: "sine.inOut", yoyo: true, repeat: 1 }, 1.0);
+      tl.fromTo("#s1-ghost", { x: 160, opacity: 0 }, { x: 0, opacity: 1, duration: 1.1, ease: "power2.out" }, 0);
+      tl.to("#s1-ghost", { x: -70, duration: 1.75, ease: "sine.inOut" }, 1.1);
+
+      tl.fromTo("#p1", { scale: 1.5, filter: "blur(16px)", opacity: 0 }, { scale: 1, filter: "blur(0px)", opacity: 1, duration: 0.5, ease: "power4.out" }, BEATS[0]);
+      tl.fromTo("#p2", { x: -320, opacity: 0 }, { x: 0, opacity: 1, duration: 0.45, ease: "expo.out" }, BEATS[1]);
+      tl.fromTo("#p3", { scaleX: 1.7, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.45, ease: "power4.out" }, BEATS[2]);
+
+      const glitchCopies = gsap.utils.toArray("#p3 .glitch-copy");
+      const amp = { a: 0 };
+      const glitchBurst = (start, dur, maxSplit) => {
+        tl.set(amp, { a: 1 }, start);
+        tl.set(glitchCopies, { opacity: 0.85 }, start);
+        tl.to(
+          amp,
+          {
+            a: 0,
+            duration: dur,
+            ease: "power3.in",
+            onUpdate: () => {
+              const step = Math.floor(tl.time() / (1 / 20));
+              glitchCopies.forEach((el, layer) => {
+                const jx = (hash(step * 13 + layer * 7) * 2 - 1) * maxSplit * amp.a;
+                const jy = (hash(step * 29 + layer * 11) * 2 - 1) * maxSplit * 0.35 * amp.a;
+                gsap.set(el, { x: jx, y: jy });
+              });
+            },
+          },
+          start,
+        );
+        tl.set(glitchCopies, { x: 0, y: 0, opacity: 0 }, start + dur);
+      };
+      glitchBurst(BEATS[2], 0.45, 16);
+      glitchBurst(2.2, 0.16, 12);
+
+      tl.fromTo("#s1-under", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power3.out" }, 1.75);
+      gsap.utils.toArray("#s1-metro i").forEach((tick, i) => {
+        tl.to(tick, { opacity: 1, duration: 0.08, yoyo: true, repeat: 1, ease: "none" }, BEATS[0] + PULSE * i);
+      });
+      tl.fromTo("#s1-metro", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "circ.out" }, 0.1);
+
+      // T1 — zoom through
+      tl.to("#s1", { scale: 2.5, opacity: 0, filter: "blur(8px)", duration: 0.4, ease: "power3.in" }, 2.7);
+      tl.fromTo("#s2", { scale: 0.5, opacity: 0, filter: "blur(8px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 2.85);
+
+      /* ═════════ 02 — 3D DEPTH (depth-scatter-assemble + 3d-text-depth-layers) ═════════ */
+      const S2 = 2.85;
+      const LAYERS = 6;
+      const OFFSET = 4;
+      document.querySelectorAll("#s2 .depth-stack").forEach((stack) => {
+        for (let i = LAYERS - 1; i >= 0; i--) {
+          const el = document.createElement("div");
+          el.className = "depth-text " + (i === 0 ? "is-front" : "is-back");
+          el.textContent = stack.dataset.glyph;
+          if (i > 0) {
+            el.style.color = `hsl(14, 78%, ${46 - i * 6}%)`; // darker, never more saturated
+            el.setAttribute("aria-hidden", "true");
+            el.setAttribute("data-layout-ignore", "");
+          }
+          el.dataset.layer = String(i);
+          stack.appendChild(el);
+        }
+      });
+      const backLayers = Array.from(document.querySelectorAll("#s2 .depth-text.is-back"));
+      const depth = { p: 0 };
+      const writeDepth = () => {
+        backLayers.forEach((el) => {
+          const i = Number(el.dataset.layer);
+          el.style.transform = `translate(${i * OFFSET * depth.p}px, ${i * OFFSET * depth.p}px)`;
+        });
+      };
+      writeDepth();
+
+      const frags = Array.from(document.querySelectorAll("#s2 .frag"));
+      const GOLDEN = Math.PI * (3 - Math.sqrt(5));
+      const RADIUS = 520,
+        Z_NEAR = 420,
+        Z_FAR = -480,
+        TUMBLE = 85;
+      frags.forEach((el, i) => {
+        const a = (i + 1) * GOLDEN;
+        const depthT = i / (frags.length - 1);
+        gsap.set(el, {
+          x: Math.cos(a) * RADIUS,
+          y: Math.sin(a) * RADIUS * 0.6,
+          z: Z_NEAR - depthT * (Z_NEAR - Z_FAR),
+          rotationX: Math.sin(a) * TUMBLE,
+          rotationY: Math.cos(a) * TUMBLE,
+          opacity: 0,
+        });
+        tl.to(el, { x: 0, y: 0, z: 0, rotationX: 0, rotationY: 0, opacity: 1, duration: 1.0, ease: "power3.out" }, S2 + 0.05 + i * 0.07);
+      });
+      tl.fromTo("#s2-cloud", { rotationY: -40 }, { rotationY: 0, duration: 1.8, ease: "power2.out" }, S2);
+      tl.to(depth, { p: 1, duration: 0.6, ease: "power2.out", onUpdate: writeDepth }, S2 + 1.15);
+      tl.fromTo("#s2-glow", { scale: 0.7, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.2, ease: "power2.out" }, S2);
+      tl.fromTo("#s2-floor", { backgroundPosition: "0px 0px" }, { backgroundPosition: "0px 360px", duration: 3.1, ease: "none" }, S2 - 0.15);
+      gsap.utils.toArray("#s2-meta div").forEach((el, i) => {
+        const t0 = S2 + 1.45 + i * 0.08;
+        tl.set(el, { opacity: 1, y: 60 }, t0);
+        tl.to(el, { y: 0, duration: 0.5, ease: "expo.out" }, t0);
+      });
+
+      // T2 — staggered color blocks (scene swaps while covered)
+      const T2 = 5.55;
+      tl.to("#wipe-a", { x: 1920, duration: 0.25, ease: "power3.inOut" }, T2);
+      tl.to("#wipe-b", { x: 1920, duration: 0.25, ease: "power3.inOut" }, T2 + 0.06);
+      tl.set("#s2", { opacity: 0 }, T2 + 0.2);
+      tl.set("#s3", { opacity: 1 }, T2 + 0.2);
+      tl.to("#wipe-a", { x: 3840, duration: 0.25, ease: "power3.inOut" }, T2 + 0.28);
+      tl.to("#wipe-b", { x: 3840, duration: 0.25, ease: "power3.inOut" }, T2 + 0.34);
+
+      /* ═════════ 03 — EASING (svg-path-draw + control-target-sync) ═════════ */
+      const S3 = 5.75;
+      const EASE = gsap.parseEase("expo.out");
+      const gx = (t) => 20 + 496 * t;
+      const gy = (p) => 420 - 400 * p;
+      const grid = document.getElementById("s3-grid");
+      for (let k = 0; k <= 4; k++) {
+        const v = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        v.setAttribute("class", "gridline");
+        v.setAttribute("x1", gx(k / 4));
+        v.setAttribute("x2", gx(k / 4));
+        v.setAttribute("y1", 20);
+        v.setAttribute("y2", 420);
+        grid.appendChild(v);
+        const h = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        h.setAttribute("class", "gridline");
+        h.setAttribute("x1", 20);
+        h.setAttribute("x2", 516);
+        h.setAttribute("y1", gy(k / 4));
+        h.setAttribute("y2", gy(k / 4));
+        grid.appendChild(h);
+      }
+      let d = "";
+      for (let k = 0; k <= 80; k++) {
+        const t = k / 80;
+        d += `${k === 0 ? "M" : "L"} ${gx(t).toFixed(2)} ${gy(EASE(t)).toFixed(2)} `;
+      }
+      const curve = document.getElementById("s3-curve");
+      curve.setAttribute("d", d);
+      [curve, document.getElementById("s3-diag")].forEach((p) => {
+        const len = p.getTotalLength() * 1.02;
+        p.style.strokeDasharray = `${len}`;
+        p.style.strokeDashoffset = `${len}`;
+      });
+      // the diagonal is dashed: draw it by revealing with a clip instead of dashoffset
+      const diag = document.getElementById("s3-diag");
+      diag.style.strokeDasharray = "10 10";
+      diag.style.strokeDashoffset = "0";
+
+      tl.fromTo("#s3-panel", { y: 70, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, S3 + 0.1);
+      tl.fromTo("#s3-diag", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, S3 + 0.3);
+      tl.to("#s3-curve", { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, S3 + 0.35);
+      tl.fromTo("#s3-dot", { scale: 0, transformOrigin: "50% 50%" }, { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, S3 + 0.45);
+      tl.fromTo("#s3-h1", { x: 220, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: "expo.out" }, S3 + 0.3);
+      tl.fromTo("#s3-h2", { clipPath: "inset(0% 0% 0% 100%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.55, ease: "power4.out" }, S3 + 0.5);
+      tl.fromTo("#s3-line", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power3.out" }, S3 + 0.35);
+      tl.fromTo("#s3-puck", { scale: 0 }, { scale: 1, duration: 0.4, ease: "back.out(2)" }, S3 + 0.55);
+
+      // One driver → dot on the curve + puck on the track + readout, in the same beat.
+      const TRAVEL = 1920 - 320 - 64;
+      const ghostsEl = document.getElementById("s3-ghosts");
+      const MOVE_AT = S3 + 0.9,
+        MOVE_DUR = 1.3,
+        GHOSTS = 10;
+      for (let k = 0; k <= GHOSTS; k++) {
+        const g = document.createElement("div");
+        g.className = "ghost-puck";
+        g.style.left = `${(EASE(k / GHOSTS) * TRAVEL).toFixed(1)}px`;
+        ghostsEl.appendChild(g);
+        tl.set(g, { opacity: 0.6 }, MOVE_AT + (MOVE_DUR * k) / GHOSTS);
+      }
+      const puck = document.getElementById("s3-puck");
+      const dot = document.getElementById("s3-dot");
+      const tOut = document.getElementById("s3-t");
+      const pOut = document.getElementById("s3-p");
+      const drive = { t: 0 };
+      const writeDrive = () => {
+        const p = EASE(drive.t);
+        gsap.set(puck, { x: p * TRAVEL });
+        dot.setAttribute("cx", gx(drive.t).toFixed(2));
+        dot.setAttribute("cy", gy(p).toFixed(2));
+        tOut.textContent = `t ${drive.t.toFixed(2)}`;
+        pOut.textContent = `p ${p.toFixed(2)}`;
+      };
+      writeDrive();
+      tl.fromTo(drive, { t: 0 }, { t: 1, duration: MOVE_DUR, ease: "none", immediateRender: false, onUpdate: writeDrive }, MOVE_AT);
+
+      // T3 — zoom through
+      tl.to("#s3", { scale: 2.5, opacity: 0, filter: "blur(8px)", duration: 0.4, ease: "power3.in" }, 8.3);
+      tl.fromTo("#s4", { scale: 0.5, opacity: 0, filter: "blur(8px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 8.45);
+
+      /* ═════════ 04 — DATA (counting-dynamic-scale + stat-bars-and-fills) ═════════ */
+      const S4 = 8.45;
+      const lengths = SCENES.map((s, i) => (i < SCENES.length - 1 ? SCENES[i + 1].at : DURATION) - s.at);
+      const maxLen = Math.max(...lengths);
+      const barsEl = document.getElementById("s4-bars");
+      lengths.forEach((len, i) => {
+        const col = document.createElement("div");
+        col.className = "bar-col";
+        const here = i === 3;
+        const barH = Math.round((len / maxLen) * 380);
+        col.innerHTML =
+          (here ? `<div id="s4-pin" style="bottom:450px">YOU ARE HERE</div>` : "") +
+          `<span class="bar-val">${len.toFixed(2)}</span>` +
+          `<div class="bar${here ? " is-here" : ""}" style="height:${barH}px"></div>` +
+          `<span class="bar-name">0${i + 1}</span>`;
+        barsEl.appendChild(col);
+      });
+      const countEl = document.getElementById("s4-count");
+      const count = { v: 0 };
+      tl.to(count, { v: DURATION * FPS, duration: 1.6, ease: "power3.out", onUpdate: () => (countEl.textContent = Math.round(count.v)) }, S4 + 0.05);
+      tl.fromTo("#s4-count", { scale: 0.5 }, { scale: 1, duration: 1.6, ease: "power3.out" }, S4 + 0.05);
+      tl.fromTo("#s4-label", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" }, S4 + 0.3);
+      tl.fromTo("#s4-sub", { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" }, S4 + 0.55);
+      tl.fromTo("#s4-title", { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: "expo.out" }, S4 + 0.1);
+      tl.fromTo("#s4-base", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power3.out" }, S4 + 0.1);
+      tl.fromTo("#s4 .bar", { scaleY: 0 }, { scaleY: 1, duration: 0.8, ease: "power3.out", stagger: 0.08 }, S4 + 0.3);
+      tl.to("#s4 .bar-val", { opacity: 1, duration: 0.3, ease: "power1.out", stagger: 0.08 }, S4 + 0.75);
+      tl.fromTo("#s4-pin", { scale: 0, y: 20, opacity: 0 }, { scale: 1, y: 0, opacity: 1, duration: 0.45, ease: "back.out(2)" }, S4 + 1.25);
+      tl.fromTo("#s4-glow", { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.out" }, S4);
+      tl.to("#s4-glow", { x: 140, scale: 1.1, duration: 2.2, ease: "sine.inOut" }, S4 + 0.2);
+
+      // T4 — zoom through
+      tl.to("#s4", { scale: 2.5, opacity: 0, filter: "blur(8px)", duration: 0.4, ease: "power3.in" }, 10.7);
+      tl.fromTo("#s5", { scale: 0.5, opacity: 0, filter: "blur(8px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 10.85);
+
+      /* ═════════ 05 — CAMERA (3d-camera-flight + motion-blur-streak + depth-of-field-blur) ═════════ */
+      const S5 = 10.85;
+      const SKILLS = ["Kinetic type", "Glitch", "Easing", "Data viz", "SVG draw", "Camera", "Depth", "Particles", "Typography", "Transitions", "Timing", "Compositing"];
+      const HERO = 5; // column 1, row 1 → world offset (−210, 0)
+      const gridEl = document.getElementById("s5-grid");
+      SKILLS.forEach((name, i) => {
+        const tile = document.createElement("div");
+        tile.className = "tile" + (i === HERO ? " is-hero" : "");
+        tile.innerHTML =
+          `<span class="tile-n mono">${pad(i + 1)}</span>` +
+          (i === HERO ? '<span class="tile-sub mono">perspective: 1000px</span>' : "") +
+          `<span class="tile-name display">${name}</span>`;
+        gridEl.appendChild(tile);
+      });
+      const world = document.getElementById("s5-world");
+      const cam = { x: 0, y: 140, z: -520, rx: 56, ry: -22 };
+      const drift = { dx: 0, drx: 0 };
+      const applyCamera = () => {
+        world.style.transform = `translate3d(${cam.x + drift.dx}px, ${cam.y}px, ${cam.z}px) rotateX(${cam.rx + drift.drx}deg) rotateY(${cam.ry}deg)`;
+      };
+      applyCamera();
+      const DIVE_AT = S5 + 0.1,
+        DIVE_DUR = 1.0;
+      tl.fromTo(
+        cam,
+        { x: 0, y: 140, z: -520, rx: 56, ry: -22 },
+        { x: 210, y: 0, z: 400, rx: 6, ry: 0, duration: DIVE_DUR, ease: "power4.out", immediateRender: false, onUpdate: applyCamera },
+        DIVE_AT,
+      );
+      tl.fromTo("#s5-stage", { filter: "blur(14px)" }, { filter: "blur(0px)", duration: DIVE_DUR, ease: "power4.out" }, DIVE_AT);
+      const others = Array.from(gridEl.children).filter((_, i) => i !== HERO);
+      tl.to(others, { "--dof": "6px", duration: 0.9, ease: "power4.out" }, DIVE_AT + 0.35);
+      tl.to(drift, { dx: -16, drx: 1.2, duration: 1.2, ease: "sine.inOut", onUpdate: applyCamera }, DIVE_AT + DIVE_DUR);
+      const heroSub = gridEl.children[HERO].querySelector(".tile-sub");
+      tl.set(heroSub, { opacity: 1, y: 30 }, DIVE_AT + 0.75);
+      tl.to(heroSub, { y: 0, duration: 0.45, ease: "expo.out" }, DIVE_AT + 0.75);
+      tl.fromTo("#s5-glow", { opacity: 0 }, { opacity: 0.8, duration: 1.0, ease: "power2.out" }, S5);
+
+      // T5 — overexposure burn into the signature
+      const T5 = 12.65;
+      tl.set("#s5", { filter: "brightness(1)" }, T5 - 0.05);
+      tl.to("#s5", { filter: "brightness(1.5)", scale: 1.03, duration: 0.2, ease: "power1.in" }, T5);
+      tl.to("#s5", { filter: "brightness(3)", scale: 1.06, duration: 0.2, ease: "power2.in" }, T5 + 0.2);
+      tl.to("#flash", { opacity: 0.5, duration: 0.25, ease: "power1.in" }, T5 + 0.15);
+      tl.to("#flash", { opacity: 1, duration: 0.15, ease: "power2.in" }, T5 + 0.4);
+      tl.set("#s5", { opacity: 0, filter: "brightness(1)", scale: 1 }, T5 + 0.55);
+      tl.set("#s6", { opacity: 1 }, T5 + 0.55);
+      tl.to("#flash", { opacity: 0, duration: 0.35, ease: "power2.out" }, T5 + 0.55);
+
+      /* ═════════ 06 — SIGNATURE (waterfall-entry + particle-burst + ambient-glow-bloom) ═════════ */
+      const S6 = 13.2;
+      tl.fromTo("#s6-glow", { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.9, ease: "power2.out" }, S6);
+      tl.to("#s6-glow", { scale: 1.06, duration: 0.9, ease: "sine.inOut" }, S6 + 0.9);
+      gsap.utils.toArray("#s6 .ltr").forEach((el, i) => {
+        const t0 = S6 + 0.1 + i * 0.055;
+        tl.set(el, { opacity: 1, y: 150 }, t0);
+        tl.to(el, { y: 0, duration: 0.5, ease: "expo.out" }, t0);
+      });
+      const UNDER_AT = S6 + 0.55;
+      tl.fromTo("#s6-under", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power3.out" }, UNDER_AT);
+      tl.fromTo("#s6-sub", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.6, ease: "power3.out" }, S6 + 0.75);
+      tl.fromTo("#s6-word", { scale: 1 }, { scale: 1.025, duration: 0.9, ease: "none" }, S6 + 0.9);
+
+      // Confetti pop fired by the underline landing.
+      const pf = document.getElementById("s6-pf");
+      const palette = ["#ff4a1c", "#f2ece1", "#ffb199"];
+      const parts = [];
+      const N = 18,
+        G = 1250,
+        CONE = 0.75,
+        FLIGHT = 0.9,
+        FADE = 0.3;
+      for (let i = 0; i < N; i++) {
+        const el = document.createElement("div");
+        el.className = "particle";
+        const size = 7 + hash(i * 3 + 1) * 8;
+        el.style.width = `${size}px`;
+        el.style.height = `${size * 0.7}px`;
+        el.style.background = palette[i % palette.length];
+        pf.appendChild(el);
+        const angle = -Math.PI / 2 + (hash(i * 5 + 2) * 2 - 1) * CONE;
+        const speed = 380 + hash(i * 7 + 3) * 420;
+        const ox = (hash(i * 13 + 5) - 0.5) * 600;
+        parts.push({ el, ox, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, spin: (hash(i * 11 + 4) * 2 - 1) * 540 });
+      }
+      const burst = { T: 0 };
+      tl.fromTo(
+        burst,
+        { T: 0 },
+        {
+          T: 1,
+          duration: FLIGHT,
+          ease: "none",
+          onUpdate: () => {
+            const t = burst.T * FLIGHT;
+            const fade = Math.min(1, (1 - burst.T) / FADE);
+            parts.forEach((p) => {
+              const x = p.ox + p.vx * t;
+              const y = p.vy * t + 0.5 * G * t * t;
+              p.el.style.transform = `translate(${x}px, ${y}px) rotate(${p.spin * t}deg)`;
+              p.el.style.opacity = String(burst.T === 0 ? 0 : fade);
+            });
+          },
+        },
+        UNDER_AT + 0.25,
+      );
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
