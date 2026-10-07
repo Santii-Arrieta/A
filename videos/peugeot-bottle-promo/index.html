@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <!-- GSAP vendored from npm: cdn.jsdelivr.net is blocked in this environment -->
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #050b16;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #050b16;
+        font-family: "Montserrat", sans-serif;
+        color: #eef3fa;
+      }
+      .layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      /* ── Macro camera over the original photo (bars 1–2) ── */
+      #macro {
+        z-index: 5;
+        background: #050b16;
+      }
+      #macro-img {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1536px;
+        height: 1024px;
+        transform-origin: 0 0;
+      }
+      #macro-shade {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at 50% 45%, rgba(5, 11, 22, 0) 30%, rgba(5, 11, 22, 0.85) 100%);
+      }
+      #macro-scrim-top {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 760px;
+        background: linear-gradient(to bottom, rgba(5, 11, 22, 0.9) 10%, rgba(5, 11, 22, 0) 100%);
+        opacity: 0;
+      }
+      #macro-scrim {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 900px;
+        background: linear-gradient(to top, rgba(5, 11, 22, 0.92) 10%, rgba(5, 11, 22, 0) 100%);
+      }
+      #slit {
+        position: absolute;
+        inset: 0;
+        background: #050b16;
+      }
+      .sweep {
+        position: absolute;
+        top: -20%;
+        left: 0;
+        width: 260px;
+        height: 140%;
+        background: linear-gradient(90deg, rgba(220, 235, 255, 0) 0%, rgba(220, 235, 255, 0.55) 50%, rgba(220, 235, 255, 0) 100%);
+        mix-blend-mode: screen;
+        opacity: 0;
+      }
+
+      /* ── Kinetic tagline words ── */
+      #words {
+        z-index: 8;
+        pointer-events: none;
+      }
+      .kw {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 1310px;
+        display: flex;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 200px;
+        line-height: 1;
+        letter-spacing: 0.04em;
+        color: #eef3fa;
+        opacity: 0;
+      }
+      .kw-label {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 1240px;
+        display: flex;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 30px;
+        letter-spacing: 0.5em;
+        color: #9fb4d6;
+        opacity: 0;
+      }
+
+      /* ── Hero stage (bars 3–5) ── */
+      #hero {
+        z-index: 2;
+        background: #050b16;
+      }
+      #hero-inner {
+        position: absolute;
+        inset: 0;
+      }
+      #bg-shield {
+        position: absolute;
+        left: -170px;
+        top: -64px;
+        width: 1480px;
+        height: 2048px;
+        filter: blur(7px) brightness(0.62);
+      }
+      #bg-tint {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at 50% 55%, rgba(30, 63, 138, 0.35) 0%, rgba(5, 11, 22, 0.75) 75%);
+      }
+      #glow {
+        position: absolute;
+        left: 40px;
+        top: 420px;
+        width: 1000px;
+        height: 1100px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(70, 120, 220, 0.5) 0%, rgba(70, 120, 220, 0) 65%);
+      }
+      .bokeh {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(190, 215, 255, 0.55) 0%, rgba(190, 215, 255, 0) 70%);
+      }
+      #bottle-wrap {
+        position: absolute;
+        left: 201px;
+        top: 445px;
+        width: 678px;
+        height: 1150px;
+      }
+      #bottle-img,
+      #end-bottle-img {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      .glint {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        -webkit-mask-image: url("assets/img/bottle.png");
+        mask-image: url("assets/img/bottle.png");
+        -webkit-mask-size: 100% 100%;
+        mask-size: 100% 100%;
+        pointer-events: none;
+      }
+      .glint-band {
+        position: absolute;
+        top: -10%;
+        left: 0;
+        width: 220px;
+        height: 120%;
+        background: linear-gradient(90deg, rgba(235, 244, 255, 0) 0%, rgba(235, 244, 255, 0.7) 50%, rgba(235, 244, 255, 0) 100%);
+        mix-blend-mode: screen;
+      }
+      #splash {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 0;
+        height: 0;
+      }
+      .drop {
+        position: absolute;
+        left: 0;
+        top: 0;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.9) 0%, rgba(200, 225, 255, 0.45) 40%, rgba(120, 170, 240, 0.1) 80%);
+        opacity: 0;
+        will-change: transform, opacity;
+      }
+      #wordmark {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 230px;
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        font-weight: 700;
+        font-size: 64px;
+        letter-spacing: 0.32em;
+        padding-left: 0.32em;
+      }
+      #wordmark span {
+        display: block;
+        opacity: 0;
+      }
+      #callouts {
+        position: absolute;
+        inset: 0;
+      }
+      #callout-svg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+      }
+      #callout-svg path {
+        fill: none;
+        stroke: #eef3fa;
+        stroke-width: 3;
+      }
+      #callout-svg circle {
+        fill: #eef3fa;
+      }
+      .label {
+        position: absolute;
+        left: 640px;
+        width: 400px;
+        opacity: 0;
+      }
+      .label .n {
+        display: block;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 24px;
+        font-weight: 700;
+        color: #9fb4d6;
+        margin-bottom: 6px;
+      }
+      .label .t {
+        display: block;
+        font-weight: 700;
+        font-size: 36px;
+        line-height: 1.15;
+        letter-spacing: 0.08em;
+      }
+
+      /* ── Environment reveal (bar 6) ── */
+      #env {
+        z-index: 3;
+        opacity: 0;
+        background: #050b16;
+      }
+      #env-img {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1536px;
+        height: 1024px;
+        transform-origin: 0 0;
+      }
+
+      /* ── End card (bars 7–8) ── */
+      #end {
+        z-index: 4;
+        opacity: 0;
+        background: radial-gradient(ellipse at 50% 40%, #13254d 0%, #050b16 70%);
+      }
+      #end-glow {
+        position: absolute;
+        left: 90px;
+        top: 160px;
+        width: 900px;
+        height: 1100px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(70, 120, 220, 0.45) 0%, rgba(70, 120, 220, 0) 65%);
+      }
+      #end-bottle {
+        position: absolute;
+        left: 230px;
+        top: 170px;
+        width: 620px;
+        height: 1052px;
+      }
+      #end-copy {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 1290px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      #end-mark {
+        display: block;
+        font-weight: 700;
+        font-size: 76px;
+        letter-spacing: 0.32em;
+        padding-left: 0.32em;
+      }
+      #end-tag {
+        display: block;
+        margin-top: 26px;
+        font-weight: 700;
+        font-size: 40px;
+        letter-spacing: 0.42em;
+        padding-left: 0.42em;
+        color: #c9d6ec;
+      }
+      #tricolor {
+        display: flex;
+        gap: 14px;
+        margin-top: 40px;
+      }
+      #tricolor i {
+        display: block;
+        width: 110px;
+        height: 8px;
+        border-radius: 4px;
+        transform-origin: left center;
+      }
+      #tricolor i:nth-child(1) {
+        background: #2a52be;
+      }
+      #tricolor i:nth-child(2) {
+        background: #eef3fa;
+      }
+      #tricolor i:nth-child(3) {
+        background: #d7263d;
+      }
+
+      #flash {
+        position: absolute;
+        inset: 0;
+        z-index: 20;
+        background: #e8f0ff;
+        opacity: 0;
+      }
+      #fade {
+        position: absolute;
+        inset: 0;
+        z-index: 21;
+        background: #000000;
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="15"
+      data-width="1080"
+      data-height="1920"
+    >
+      <svg width="0" height="0" aria-hidden="true" style="position: absolute">
+        <filter id="vstreak" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur id="vstreak-blur" in="SourceGraphic" stdDeviation="0 0" />
+        </filter>
+      </svg>
+
+      <!-- Bars 3–5: hero stage -->
+      <div id="hero" class="layer">
+        <div id="hero-inner">
+          <img id="bg-shield" src="assets/img/plate-shield.jpg" alt="" />
+          <div id="bg-tint"></div>
+          <div id="bokeh-field"></div>
+          <div id="glow"></div>
+          <div id="bottle-wrap">
+            <img id="bottle-img" src="assets/img/bottle.png" alt="Peugeot bottle" style="filter: url(#vstreak)" />
+            <div class="glint" id="glint-hero"><div class="glint-band" id="glint-hero-band"></div></div>
+          </div>
+          <div id="splash"></div>
+          <div id="wordmark">
+            <span>P</span><span>E</span><span>U</span><span>G</span><span>E</span><span>O</span><span>T</span>
+          </div>
+          <div id="callouts">
+            <svg id="callout-svg" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg"></svg>
+            <div class="label" id="lab-0"><span class="n">01</span><span class="t">STEEL CAP &amp; CARRY LOOP</span></div>
+            <div class="label" id="lab-1"><span class="n">02</span><span class="t">LION EMBLEM</span></div>
+            <div class="label" id="lab-2"><span class="n">03</span><span class="t">TRICOLOUR DETAIL</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bar 6: environment reveal on the original photo -->
+      <div id="env" class="layer">
+        <img id="env-img" src="assets/img/hero.jpg" alt="" />
+        <div class="sweep" id="env-sweep"></div>
+      </div>
+
+      <!-- Bars 7–8: end card -->
+      <div id="end" class="layer">
+        <div id="end-glow"></div>
+        <div id="end-bottle">
+          <img id="end-bottle-img" src="assets/img/bottle.png" alt="" />
+          <div class="glint" id="glint-end"><div class="glint-band" id="glint-end-band"></div></div>
+        </div>
+        <div id="end-copy">
+          <div id="end-mark">PEUGEOT</div>
+          <div id="end-tag">DRIVE YOUR FUTURE</div>
+          <div id="tricolor"><i></i><i></i><i></i></div>
+        </div>
+      </div>
+
+      <!-- Bars 1–2: macro camera -->
+      <div id="macro" class="layer">
+        <img id="macro-img" src="assets/img/hero.jpg" alt="" />
+        <div id="macro-shade"></div>
+        <div class="sweep" id="macro-sweep"></div>
+        <div id="macro-scrim"></div>
+        <div id="macro-scrim-top"></div>
+        <div id="slit"></div>
+      </div>
+
+      <div id="words" class="layer">
+        <div class="kw-label" id="kw-label">PEUGEOT</div>
+        <div class="kw" id="kw-0">DRIVE</div>
+        <div class="kw" id="kw-1">YOUR</div>
+        <div class="kw" id="kw-2" style="top: 330px">FUTURE</div>
+      </div>
+
+      <div id="flash"></div>
+      <div id="fade"></div>
+
+      <!-- Soundtrack: synthesized 128 BPM bed + SFX on each visual hit (scripts/make_audio.py) -->
+      <audio
+        id="promo-audio"
+        src="assets/audio/promo-mix.wav"
+        data-start="0"
+        data-duration="15"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const BPM = 128;
+      const BEAT = 60 / BPM;
+      const BAR = 4 * BEAT; // 1.875 s — 8 bars = 15 s
+      const bar = (b, beat = 0) => b * BAR + beat * BEAT;
+
+      const hash = (n) => {
+        const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+        return x - Math.floor(x);
+      };
+
+      // Virtual camera on the 1536×1024 photo: put source point (px, py) at frame point (fx, fy).
+      // Clamped so the photo always covers the 1080×1920 frame (no empty bands at its edges).
+      const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+      const camPose = (px, py, S, fx = 540, fy = 900) => ({
+        x: clamp(fx - px * S, 1080 - 1536 * S, 0),
+        y: clamp(fy - py * S, 1920 - 1024 * S, 0),
+        scale: S,
+      });
+
+      /* ═════════ Bars 1–2 — macros + DRIVE / YOUR / FUTURE ═════════ */
+      const EMBLEM = [840, 455];
+      const CAP = [935, 120];
+      const TAG = [742, 815];
+      tl.fromTo("#macro-img", camPose(...EMBLEM, 2.35), { ...camPose(...EMBLEM, 2.05), duration: BAR, ease: "power1.out" }, 0);
+      tl.fromTo("#macro-img", { filter: "blur(12px) brightness(0.7)" }, { filter: "blur(0px) brightness(1)", duration: 0.8, ease: "power2.out" }, 0.1);
+      // light slit opens from the centre line
+      tl.fromTo("#slit", { clipPath: "inset(0% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 100% 0%)", duration: 0.7, ease: "power3.inOut" }, 0.05);
+      tl.fromTo("#macro-sweep", { x: -300, opacity: 0.9 }, { x: 1200, opacity: 0.9, duration: 0.7, ease: "power2.inOut" }, bar(0, 1.2));
+
+      // cut 1 → cap (whip with horizontal blur), cut 2 → tagline (vertical whip)
+      tl.set("#macro-img", { ...camPose(...CAP, 2.2), filter: "blur(18px) brightness(1)" }, bar(1));
+      tl.fromTo("#macro-img", { x: camPose(...CAP, 2.2).x + 260 }, { x: camPose(...CAP, 2.2).x, duration: 0.35, ease: "power4.out", immediateRender: false }, bar(1));
+      tl.to("#macro-img", { filter: "blur(0px) brightness(1)", duration: 0.35, ease: "power4.out" }, bar(1));
+      tl.to("#macro-img", { scale: 2.32, x: camPose(...CAP, 2.32).x, y: camPose(...CAP, 2.32).y, duration: BAR / 2 - 0.35, ease: "none" }, bar(1) + 0.35);
+      tl.set("#macro-img", { ...camPose(...TAG, 2.25), filter: "blur(18px) brightness(1)" }, bar(1, 2));
+      tl.fromTo("#macro-img", { y: camPose(...TAG, 2.25).y - 240 }, { y: camPose(...TAG, 2.25).y, duration: 0.35, ease: "power4.out", immediateRender: false }, bar(1, 2));
+      tl.to("#macro-img", { filter: "blur(0px) brightness(1)", duration: 0.35, ease: "power4.out" }, bar(1, 2));
+      tl.to("#macro-img", { scale: 2.45, x: camPose(...TAG, 2.45).x, y: camPose(...TAG, 2.45).y, duration: BAR / 2 - 0.35, ease: "none" }, bar(1, 2) + 0.35);
+      tl.fromTo("#macro-sweep", { x: -300, opacity: 0.9 }, { x: 1200, opacity: 0.9, duration: 0.6, ease: "power2.inOut", immediateRender: false }, bar(1, 3));
+
+      // tagline words slam on the beat, one replaces the next in place
+      tl.fromTo("#kw-label", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power3.out" }, bar(0, 1));
+      const WORD_AT = [bar(0, 2), bar(1, 1), bar(1, 3)];
+      const WORD_FROM = [
+        { scale: 1.6, filter: "blur(14px)", opacity: 0 },
+        { x: -260, filter: "blur(8px)", opacity: 0 },
+        { y: 120, filter: "blur(8px)", opacity: 0 },
+      ];
+      WORD_AT.forEach((t, i) => {
+        tl.fromTo(`#kw-${i}`, WORD_FROM[i], { scale: 1, x: 0, y: 0, filter: "blur(0px)", opacity: 1, duration: 0.4, ease: i === 1 ? "expo.out" : "power4.out" }, t);
+        if (i > 0) tl.set(`#kw-${i - 1}`, { opacity: 0 }, t);
+      });
+      // last word moves to the top third: swap the scrim and drop the bottom label with it
+      tl.set("#macro-scrim-top", { opacity: 1 }, bar(1, 2));
+      tl.set(["#macro-scrim", "#kw-label"], { opacity: 0 }, bar(1, 2));
+
+      /* ═════════ Bar 3 — flash into the hero landing ═════════ */
+      const HERO_AT = bar(2);
+      tl.to("#flash", { opacity: 1, duration: 0.18, ease: "power2.in" }, HERO_AT - 0.18);
+      tl.set(["#macro", "#words"], { opacity: 0 }, HERO_AT);
+      tl.to("#flash", { opacity: 0, duration: 0.45, ease: "power2.out" }, HERO_AT);
+
+      // backdrop: slow push + parallax drift for the whole hero section
+      tl.fromTo("#bg-shield", { scale: 1.18, x: 40 }, { scale: 1.02, x: -40, duration: bar(5) - HERO_AT, ease: "power1.out" }, HERO_AT);
+      tl.fromTo("#glow", { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.9, ease: "power2.out" }, HERO_AT + 0.4);
+
+      // floating bokeh droplets (deterministic positions)
+      const bokehField = document.getElementById("bokeh-field");
+      for (let i = 0; i < 12; i++) {
+        const b = document.createElement("div");
+        b.className = "bokeh";
+        const size = 40 + hash(i * 3 + 1) * 110;
+        b.style.width = `${size}px`;
+        b.style.height = `${size}px`;
+        b.style.left = `${hash(i * 5 + 2) * 1000}px`;
+        b.style.top = `${200 + hash(i * 7 + 3) * 1500}px`;
+        bokehField.appendChild(b);
+        tl.fromTo(b, { y: 60, opacity: 0 }, { y: -140 - hash(i) * 120, opacity: 0.35 + hash(i * 11) * 0.4, duration: bar(5) - HERO_AT, ease: "none" }, HERO_AT);
+      }
+
+      // bottle flies up out of the flash with a vertical streak, lands on beat 2 of bar 3
+      const LAND_AT = bar(2, 1);
+      const FLY = LAND_AT - HERO_AT + 0.15;
+      const streak = document.getElementById("vstreak-blur");
+      const blur = { v: 0 };
+      const writeBlur = () => streak.setAttribute("stdDeviation", `0 ${blur.v}`);
+      writeBlur();
+      tl.fromTo("#bottle-wrap", { y: 1250, rotation: 24, scale: 0.9 }, { y: 0, rotation: -12, scale: 1, duration: FLY, ease: "expo.out" }, HERO_AT);
+      tl.fromTo(blur, { v: 26 }, { v: 0, duration: FLY, ease: "expo.out", onUpdate: writeBlur }, HERO_AT);
+
+      // landing: water splash burst from the bottle base + a short camera shake
+      const BASE = { x: 540 - 150, y: 445 + 1100 };
+      const splash = document.getElementById("splash");
+      const drops = [];
+      for (let i = 0; i < 30; i++) {
+        const d = document.createElement("div");
+        d.className = "drop";
+        const size = 5 + hash(i * 3 + 7) * 12;
+        d.style.width = `${size}px`;
+        d.style.height = `${size}px`;
+        splash.appendChild(d);
+        const angle = -Math.PI / 2 + (hash(i * 5 + 9) * 2 - 1) * 1.15;
+        const speed = 600 + hash(i * 7 + 4) * 900;
+        drops.push({ el: d, ox: BASE.x + (hash(i * 13) - 0.5) * 420, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed });
+      }
+      const burst = { T: 0 };
+      const FLIGHT = 1.2;
+      tl.fromTo(
+        burst,
+        { T: 0 },
+        {
+          T: 1,
+          duration: FLIGHT,
+          ease: "none",
+          onUpdate: () => {
+            const t = burst.T * FLIGHT;
+            const fade = Math.min(1, (1 - burst.T) / 0.35);
+            drops.forEach((p) => {
+              p.el.style.transform = `translate(${p.ox + p.vx * t}px, ${BASE.y + p.vy * t + 0.5 * 2200 * t * t}px)`;
+              p.el.style.opacity = String(burst.T === 0 ? 0 : fade);
+            });
+          },
+        },
+        LAND_AT - 0.05,
+      );
+      const shake = { a: 0 };
+      tl.fromTo(
+        shake,
+        { a: 1 },
+        {
+          a: 0,
+          duration: 0.4,
+          ease: "power2.out",
+          immediateRender: false,
+          onUpdate: () => {
+            const step = Math.floor(tl.time() * 30);
+            gsap.set("#hero-inner", { x: (hash(step * 3) * 2 - 1) * 14 * shake.a, y: (hash(step * 7) * 2 - 1) * 14 * shake.a });
+          },
+        },
+        LAND_AT - 0.05,
+      );
+      tl.set("#hero-inner", { x: 0, y: 0 }, LAND_AT + 0.36);
+
+      // idle float + wordmark + glints
+      tl.to("#bottle-wrap", { y: -16, duration: BAR / 2, ease: "sine.inOut", yoyo: true, repeat: 2 }, LAND_AT + 0.4);
+      gsap.utils.toArray("#wordmark span").forEach((el, i) => {
+        const t0 = bar(2, 2) + i * 0.05;
+        tl.set(el, { opacity: 1, y: 60 }, t0);
+        tl.to(el, { y: 0, duration: 0.5, ease: "expo.out" }, t0);
+      });
+      tl.fromTo("#glint-hero-band", { x: -300 }, { x: 900, duration: 0.8, ease: "power2.inOut" }, bar(3));
+      tl.fromTo("#glint-hero-band", { x: -300 }, { x: 900, duration: 0.8, ease: "power2.inOut", immediateRender: false }, bar(3, 3));
+
+      /* ═════════ Bar 5 — callouts drawn to real details ═════════ */
+      const CO_AT = bar(4);
+      const SHIFT = { x: -180, s: 0.86, r: -12 };
+      tl.to("#bottle-wrap", { x: SHIFT.x, scale: SHIFT.s, duration: 0.45, ease: "power3.inOut" }, CO_AT);
+      tl.to("#wordmark", { opacity: 0.35, duration: 0.45, ease: "power2.out" }, CO_AT);
+      // detail points in bottle-crop pixels (source photo minus the 520,10 crop origin)
+      const DETAILS = [
+        [415, 70],
+        [320, 410],
+        [252, 845],
+      ];
+      const DISP = 1150 / 958; // crop px → displayed px
+      const C = { x: 201 + 339, y: 445 + 575 };
+      const rad = (SHIFT.r * Math.PI) / 180;
+      const svg = document.getElementById("callout-svg");
+      const NS = "http://www.w3.org/2000/svg";
+      DETAILS.forEach(([cx, cy], i) => {
+        const lx = (cx * DISP - 339) * SHIFT.s;
+        const ly = (cy * DISP - 575) * SHIFT.s;
+        const px = C.x + SHIFT.x + lx * Math.cos(rad) - ly * Math.sin(rad);
+        const py = C.y + lx * Math.sin(rad) + ly * Math.cos(rad);
+        const labelY = 430 + i * 330;
+        document.getElementById(`lab-${i}`).style.top = `${labelY - 10}px`;
+        const path = document.createElementNS(NS, "path");
+        path.setAttribute("d", `M ${px.toFixed(1)} ${py.toFixed(1)} L ${(px + 70).toFixed(1)} ${labelY + 28} L 620 ${labelY + 28}`);
+        svg.appendChild(path);
+        const dot = document.createElementNS(NS, "circle");
+        dot.setAttribute("cx", px.toFixed(1));
+        dot.setAttribute("cy", py.toFixed(1));
+        dot.setAttribute("r", "9");
+        svg.appendChild(dot);
+        const len = path.getTotalLength() * 1.02;
+        path.style.strokeDasharray = `${len}`;
+        path.style.strokeDashoffset = `${len}`;
+        const t0 = CO_AT + 0.3 + i * BEAT * 0.5;
+        tl.fromTo(dot, { scale: 0, transformOrigin: "50% 50%" }, { scale: 1, duration: 0.3, ease: "back.out(2.5)" }, t0);
+        tl.to(path, { strokeDashoffset: 0, duration: 0.4, ease: "power2.out" }, t0 + 0.05);
+        tl.fromTo(`#lab-${i}`, { x: 40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.4, ease: "expo.out" }, t0 + 0.3);
+      });
+
+      /* ═════════ Bar 6 — zoom-out reveal of the full shot ═════════ */
+      const ENV_AT = bar(5);
+      tl.to("#hero", { scale: 1.6, opacity: 0, filter: "blur(10px)", duration: 0.35, ease: "power3.in" }, ENV_AT - 0.2);
+      tl.fromTo("#env", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, ENV_AT - 0.05);
+      tl.fromTo("#env-img", camPose(...EMBLEM, 2.6, 540, 960), { ...camPose(870, 520, 1.9, 540, 960), duration: BAR, ease: "power3.out" }, ENV_AT - 0.05);
+      tl.fromTo("#env-img", { filter: "blur(8px)" }, { filter: "blur(0px)", duration: 0.5, ease: "power2.out" }, ENV_AT - 0.05);
+      tl.fromTo("#env-sweep", { x: -300, opacity: 0.8 }, { x: 1200, opacity: 0.8, duration: 0.8, ease: "power2.inOut" }, bar(5, 2));
+
+      /* ═════════ Bars 7–8 — end card ═════════ */
+      const END_AT = bar(6);
+      tl.to("#env", { scale: 1.5, opacity: 0, filter: "blur(10px)", duration: 0.35, ease: "power3.in" }, END_AT - 0.2);
+      tl.fromTo("#end", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.45, ease: "power3.out" }, END_AT - 0.05);
+      tl.fromTo("#end-glow", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.0, ease: "power2.out" }, END_AT);
+      tl.fromTo("#end-bottle", { y: 80, rotation: -2 }, { y: 0, rotation: -12, duration: 0.9, ease: "expo.out" }, END_AT - 0.05);
+      tl.fromTo("#end-mark", { y: 40, opacity: 0, filter: "blur(12px)" }, { y: 0, opacity: 1, filter: "blur(0px)", duration: 0.7, ease: "power3.out" }, bar(6, 1));
+      tl.fromTo("#end-tag", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.6, ease: "power3.out" }, bar(6, 2));
+      tl.fromTo("#tricolor i", { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: "power3.out", stagger: 0.09 }, bar(6, 3));
+      tl.fromTo("#glint-end-band", { x: -300 }, { x: 900, duration: 0.9, ease: "power2.inOut" }, bar(7));
+      tl.to("#end-bottle", { scale: 1.03, duration: bar(8) - bar(6, 2), ease: "none" }, bar(6, 2));
+      tl.to("#fade", { opacity: 1, duration: 0.3, ease: "power1.in" }, bar(8) - 0.3);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

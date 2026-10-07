@@ -1,0 +1,158 @@
+{
+ "bpm": 128,
+ "bar": 1.875,
+ "events": [
+  {
+   "sfx": "whoosh-cinematic",
+   "t": 0.05
+  },
+  {
+   "sfx": "sparkle",
+   "t": 0.562
+  },
+  {
+   "sfx": "impact-bass-1",
+   "t": 0.887
+  },
+  {
+   "sfx": "whoosh-short",
+   "t": 1.664
+  },
+  {
+   "sfx": "whoosh",
+   "t": 2.153
+  },
+  {
+   "sfx": "impact-bass-1",
+   "t": 2.294
+  },
+  {
+   "sfx": "whoosh-short",
+   "t": 2.602
+  },
+  {
+   "sfx": "impact-bass-2",
+   "t": 3.258
+  },
+  {
+   "sfx": "riser(tail)",
+   "t": 2.35
+  },
+  {
+   "sfx": "impact-bass-2",
+   "t": 3.727
+  },
+  {
+   "sfx": "whoosh",
+   "t": 3.609
+  },
+  {
+   "sfx": "splash(synth)",
+   "t": 4.169
+  },
+  {
+   "sfx": "impact-bass-1",
+   "t": 4.139
+  },
+  {
+   "sfx": "key-press",
+   "t": 4.688
+  },
+  {
+   "sfx": "key-press",
+   "t": 4.737
+  },
+  {
+   "sfx": "key-press",
+   "t": 4.787
+  },
+  {
+   "sfx": "key-press",
+   "t": 4.838
+  },
+  {
+   "sfx": "key-press",
+   "t": 4.888
+  },
+  {
+   "sfx": "key-press",
+   "t": 4.938
+  },
+  {
+   "sfx": "key-press",
+   "t": 4.987
+  },
+  {
+   "sfx": "chime",
+   "t": 5.625
+  },
+  {
+   "sfx": "sparkle",
+   "t": 7.031
+  },
+  {
+   "sfx": "whoosh-short",
+   "t": 7.339
+  },
+  {
+   "sfx": "pop",
+   "t": 7.8
+  },
+  {
+   "sfx": "click-soft",
+   "t": 8.1
+  },
+  {
+   "sfx": "pop",
+   "t": 8.034
+  },
+  {
+   "sfx": "click-soft",
+   "t": 8.334
+  },
+  {
+   "sfx": "pop",
+   "t": 8.269
+  },
+  {
+   "sfx": "click-soft",
+   "t": 8.569
+  },
+  {
+   "sfx": "whoosh-cinematic",
+   "t": 9.175
+  },
+  {
+   "sfx": "sparkle",
+   "t": 10.312
+  },
+  {
+   "sfx": "whoosh",
+   "t": 10.889
+  },
+  {
+   "sfx": "impact-bass-2",
+   "t": 11.227
+  },
+  {
+   "sfx": "whoosh-short",
+   "t": 11.558
+  },
+  {
+   "sfx": "click-soft",
+   "t": 12.656
+  },
+  {
+   "sfx": "click-soft",
+   "t": 12.746
+  },
+  {
+   "sfx": "click-soft",
+   "t": 12.836
+  },
+  {
+   "sfx": "chime",
+   "t": 13.125
+  }
+ ]
+}
