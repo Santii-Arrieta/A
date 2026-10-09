@@ -1,0 +1,753 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <!-- Vendored locally (cdn.jsdelivr.net is blocked in this environment) -->
+    <script src="vendor/gsap.min.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three.module.js",
+          "three/addons/environments/RoomEnvironment.js": "./vendor/RoomEnvironment.js"
+        }
+      }
+    </script>
+    <script>
+      // Declared-compute hold: the module below resolves this once the 3D scene can draw.
+      window.__hf = window.__hf || {};
+      window.__hf.buildReady = window.__hf.buildReady || {};
+      window.__hf.buildReady["bottle-3d"] = new Promise((resolve) => (window.__sceneReady = resolve));
+    </script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #03070f;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #03070f;
+        font-family: "Montserrat", sans-serif;
+        color: #eef3fa;
+      }
+      .full {
+        position: absolute;
+        inset: 0;
+      }
+      #bg {
+        background: radial-gradient(ellipse at 50% 42%, #10285a 0%, #061331 40%, #03070f 78%);
+      }
+      #bg-flash {
+        opacity: 0;
+      }
+      #fx-rgb,
+      #fx-blur {
+        position: absolute;
+        inset: 0;
+      }
+      #three {
+        display: block;
+        width: 1080px;
+        height: 1920px;
+      }
+      #split-lines {
+        opacity: 0;
+      }
+      .split-line {
+        position: absolute;
+        top: 0;
+        width: 6px;
+        height: 1920px;
+        background: #03070f;
+      }
+      .split-label {
+        position: absolute;
+        top: 1640px;
+        width: 360px;
+        display: flex;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 30px;
+        letter-spacing: 0.3em;
+        opacity: 0;
+      }
+      .kw {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 1430px;
+        display: flex;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 210px;
+        line-height: 1;
+        letter-spacing: 0.03em;
+        opacity: 0;
+      }
+      #mark {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 190px;
+        display: flex;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 72px;
+        letter-spacing: 0.34em;
+        padding-left: 0.34em;
+        opacity: 0;
+      }
+      #end-copy {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 1390px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      #end-mark {
+        display: block;
+        font-weight: 700;
+        font-size: 84px;
+        letter-spacing: 0.32em;
+        padding-left: 0.32em;
+        opacity: 0;
+      }
+      #end-tag {
+        display: block;
+        margin-top: 26px;
+        font-weight: 700;
+        font-size: 42px;
+        letter-spacing: 0.42em;
+        padding-left: 0.42em;
+        color: #c9d6ec;
+      }
+      #end-tri {
+        display: flex;
+        gap: 14px;
+        margin-top: 40px;
+      }
+      #end-tri i {
+        display: block;
+        width: 120px;
+        height: 9px;
+        border-radius: 5px;
+        transform-origin: left center;
+      }
+      .c-blue {
+        background: #2a52be;
+      }
+      .c-white {
+        background: #eef3fa;
+      }
+      .c-red {
+        background: #d7263d;
+      }
+      .wipe {
+        position: absolute;
+        left: 0;
+        top: 1920px;
+        width: 1080px;
+        height: 1920px;
+      }
+      #flash {
+        background: #eaf1ff;
+        opacity: 0;
+      }
+      #fade {
+        background: #000000;
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="15"
+      data-width="1080"
+      data-height="1920"
+    >
+      <svg width="0" height="0" aria-hidden="true" style="position: absolute">
+        <filter id="hblur" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur id="hblur-node" in="SourceGraphic" stdDeviation="0 0" />
+        </filter>
+      </svg>
+      <div id="bg" class="full"></div>
+      <div id="bg-flash" class="full"></div>
+      <div id="fx-blur" style="filter: url(#hblur)">
+        <div id="fx-rgb"><canvas id="three" width="1080" height="1920"></canvas></div>
+      </div>
+
+      <div id="split-lines" class="full">
+        <div class="split-line" style="left: 357px"></div>
+        <div class="split-line" style="left: 717px"></div>
+        <div class="split-label" id="sl-0" style="left: 0">DRIVE</div>
+        <div class="split-label" id="sl-1" style="left: 360px; color: #0b1a3a">YOUR</div>
+        <div class="split-label" id="sl-2" style="left: 720px">FUTURE</div>
+      </div>
+
+      <div class="kw" id="w0">DRIVE</div>
+      <div class="kw" id="w1">YOUR</div>
+      <div class="kw" id="w2">FUTURE</div>
+      <div id="mark">PEUGEOT</div>
+
+      <div id="end-copy">
+        <div id="end-mark">PEUGEOT</div>
+        <div id="end-tag">DRIVE YOUR FUTURE</div>
+        <div id="end-tri"><i class="c-blue"></i><i class="c-white"></i><i class="c-red"></i></div>
+      </div>
+
+      <div class="wipe c-blue" id="wipe-0"></div>
+      <div class="wipe c-white" id="wipe-1"></div>
+      <div class="wipe c-red" id="wipe-2"></div>
+      <div id="flash" class="full"></div>
+      <div id="fade" class="full"></div>
+
+      <!-- 144 BPM electronic soundtrack, hits aligned to every cut (scripts/make_audio.py) -->
+      <audio
+        id="promo-audio"
+        src="assets/audio/promo-3d.wav"
+        data-start="0"
+        data-duration="15"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+    </div>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+      const W = 1080,
+        H = 1920,
+        DURATION = 15;
+      const BPM = 144;
+      const BEAT = 60 / BPM;
+      const BAR = 4 * BEAT; // 1.6667 s — 9 bars = 15 s
+      const bar = (b, beat = 0) => b * BAR + beat * BEAT;
+
+      // Shot cuts — every shot boundary lands on the beat grid.
+      const CUT = {
+        A: 0,
+        B: bar(0, 2),
+        C: bar(1),
+        D: bar(1, 2),
+        E: bar(2),
+        F: bar(3),
+        G: bar(4),
+        H: bar(5),
+        I: bar(6),
+        J: bar(7),
+      };
+      const LAND = bar(2, 1);
+
+      const hash = (n) => {
+        const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+        return x - Math.floor(x);
+      };
+      const clamp01 = (v) => Math.min(1, Math.max(0, v));
+      const lerp = (a, b, k) => a + (b - a) * k;
+      const outExpo = (k) => (k >= 1 ? 1 : 1 - Math.pow(2, -10 * k));
+      const inOutCubic = (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+      const outCubic = (k) => 1 - Math.pow(1 - k, 3);
+
+      /* ── renderer, lights, environment ── */
+      const canvas = document.getElementById("three");
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(1);
+      renderer.setSize(W, H, false);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 0.92;
+      renderer.setClearColor(0x000000, 0);
+
+      const scene = new THREE.Scene();
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+      scene.environmentIntensity = 0.55;
+
+      const camera = new THREE.PerspectiveCamera(30, W / H, 0.05, 200);
+      const hemi = new THREE.HemisphereLight(0x6f8fd6, 0x05070c, 0.45);
+      scene.add(hemi);
+      const key = new THREE.DirectionalLight(0xf4f8ff, 3.2);
+      key.position.set(4, 6, 6);
+      scene.add(key);
+      const rimL = new THREE.DirectionalLight(0x4f8bff, 4.5);
+      rimL.position.set(-6, 3, -4);
+      scene.add(rimL);
+      const rimR = new THREE.DirectionalLight(0x9fc4ff, 3.5);
+      rimR.position.set(6, 1, -5);
+      scene.add(rimR);
+      const sweep = new THREE.PointLight(0xffffff, 0, 8, 1.5);
+      scene.add(sweep);
+
+      /* ── label texture: body blue, lion decal from the photo, typeset wordmark + tagline ── */
+      const loadImg = (src) =>
+        new Promise((res, rej) => {
+          const im = new Image();
+          im.onload = () => res(im);
+          im.onerror = rej;
+          im.src = src;
+        });
+      const [lionImg] = await Promise.all([loadImg("assets/img/lion.png"), document.fonts.load("700 60px Montserrat")]);
+
+      const BODY_BLUE = "#1a3672";
+      const RB = 0.82; // body radius (photo proportions ≈ 1 : 2.5)
+      const LH = 962; // body height 2.95 at ≈326 px/unit
+      const PX = LH / 2.95;
+      const LW = Math.round(2 * Math.PI * RB * PX); // circumference at the same px/unit
+      const CX = LW / 2; // front centre (cylinder thetaStart = π)
+      const labelY = (y) => (1.1 - y) * PX; // world y on the body → canvas y
+
+      function paintLabel(ctx, mode) {
+        // mode: "color" (albedo) or "rough" (roughness map: logo/print glossier)
+        ctx.fillStyle = mode === "color" ? BODY_BLUE : "#8c8c8c";
+        ctx.fillRect(0, 0, LW, LH);
+        if (mode === "color") {
+          // fine powder-coat speckle (seeded)
+          for (let i = 0; i < 9000; i++) {
+            const x = hash(i * 3 + 1) * LW,
+              y = hash(i * 7 + 2) * LH;
+            ctx.fillStyle = hash(i * 11) > 0.5 ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)";
+            ctx.fillRect(x, y, 2, 2);
+          }
+        }
+        const ink = mode === "color" ? "#e9eef6" : "#262626";
+        const lionH = 165,
+          lionW = (lionImg.width / lionImg.height) * lionH;
+        if (mode === "color") {
+          ctx.drawImage(lionImg, CX - lionW / 2, labelY(0.78), lionW, lionH);
+        } else {
+          ctx.save();
+          ctx.filter = "brightness(0)";
+          ctx.globalAlpha = 0.85;
+          ctx.drawImage(lionImg, CX - lionW / 2, labelY(0.78), lionW, lionH);
+          ctx.restore();
+        }
+        ctx.fillStyle = ink;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = "700 46px Montserrat";
+        ctx.letterSpacing = "11px";
+        ctx.fillText("PEUGEOT", CX + 7, labelY(0.08));
+        ctx.font = "700 26px Montserrat";
+        ctx.letterSpacing = "10px";
+        ["DRIVE", "YOUR", "FUTURE"].forEach((w, i) => ctx.fillText(w, CX + 5, labelY(-1.05) + i * 40));
+        const triY = labelY(-1.05) + 118;
+        const tri = mode === "color" ? ["#2a52be", "#e9eef6", "#d7263d"] : ["#262626", "#262626", "#262626"];
+        tri.forEach((c, i) => {
+          ctx.fillStyle = c;
+          ctx.fillRect(CX - 96 + i * 66, triY, 60, 7);
+        });
+      }
+      const mkCanvasTex = (mode) => {
+        const c = document.createElement("canvas");
+        c.width = LW;
+        c.height = LH;
+        paintLabel(c.getContext("2d"), mode);
+        const t = new THREE.CanvasTexture(c);
+        if (mode === "color") t.colorSpace = THREE.SRGBColorSpace;
+        t.anisotropy = 8;
+        return t;
+      };
+
+      /* ── the bottle ── */
+      const bottle = new THREE.Group();
+      scene.add(bottle);
+      const blueMat = new THREE.MeshPhysicalMaterial({
+        color: BODY_BLUE,
+        roughness: 0.55,
+        metalness: 0.15,
+        clearcoat: 0.55,
+        clearcoatRoughness: 0.28,
+      });
+      const labelMat = blueMat.clone();
+      labelMat.color.set(0xffffff);
+      labelMat.map = mkCanvasTex("color");
+      labelMat.roughnessMap = mkCanvasTex("rough");
+      labelMat.roughness = 1.0;
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(RB, RB, 2.95, 160, 1, true, Math.PI, Math.PI * 2), labelMat);
+      body.position.y = 1.1 - 2.95 / 2;
+      bottle.add(body);
+      const v2 = (pts) => pts.map(([x, y]) => new THREE.Vector2(x * RB, y));
+      const base = new THREE.Mesh(
+        new THREE.LatheGeometry(v2([[0, -2.0], [0.82, -2.0], [0.94, -1.98], [0.99, -1.93], [1.0, -1.85]]), 160),
+        blueMat,
+      );
+      bottle.add(base);
+      const shoulder = new THREE.Mesh(
+        new THREE.LatheGeometry(
+          v2([[1.0, 1.1], [0.995, 1.25], [0.97, 1.4], [0.9, 1.56], [0.8, 1.7], [0.7, 1.83], [0.645, 1.96], [0.63, 2.05]]),
+          160,
+        ),
+        blueMat,
+      );
+      bottle.add(shoulder);
+      const steel = new THREE.MeshStandardMaterial({ color: 0xd5dbe4, metalness: 1, roughness: 0.22 });
+      const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.535, 0.535, 0.13, 128), steel);
+      collar.position.y = 2.115;
+      bottle.add(collar);
+      const gun = new THREE.MeshStandardMaterial({ color: 0x6c7480, metalness: 1, roughness: 0.22, envMapIntensity: 1.8 });
+      const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.56, 0.56, 0.6, 128), gun);
+      cap.position.y = 2.48;
+      bottle.add(cap);
+      const capTop = new THREE.Mesh(new THREE.CylinderGeometry(0.49, 0.56, 0.06, 128), gun);
+      capTop.position.y = 2.81;
+      bottle.add(capTop);
+      const plastic = new THREE.MeshStandardMaterial({ color: 0x15181d, metalness: 0.2, roughness: 0.38 });
+      const handle = new THREE.Mesh(new THREE.TorusGeometry(0.44, 0.066, 28, 96, Math.PI), plastic);
+      handle.position.y = 2.84;
+      bottle.add(handle);
+      [-0.44, 0.44].forEach((x) => {
+        const m = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.14, 32), plastic);
+        m.position.set(x, 2.84, 0);
+        bottle.add(m);
+      });
+      // condensation droplets on the body (seeded)
+      const dropGeo = new THREE.SphereGeometry(1, 14, 10);
+      const dropMat = new THREE.MeshPhysicalMaterial({
+        color: 0xdfe9ff,
+        roughness: 0.04,
+        metalness: 0.1,
+        clearcoat: 1,
+        transparent: true,
+        opacity: 0.32,
+      });
+      const N_DROPS = 320;
+      const drops = new THREE.InstancedMesh(dropGeo, dropMat, N_DROPS);
+      const m4 = new THREE.Matrix4(),
+        q4 = new THREE.Quaternion(),
+        s4 = new THREE.Vector3(),
+        p4 = new THREE.Vector3();
+      for (let i = 0; i < N_DROPS; i++) {
+        const th = hash(i * 3 + 5) * Math.PI * 2;
+        const y = -1.85 + hash(i * 7 + 1) * 3.4;
+        const r = (y > 1.1 ? 0.95 : 1.0) * RB;
+        const sz = 0.006 + hash(i * 13 + 2) * 0.017;
+        p4.set(Math.sin(th) * r, y, Math.cos(th) * r);
+        q4.setFromAxisAngle(new THREE.Vector3(0, 1, 0), th);
+        s4.set(sz, sz * (1.2 + hash(i) * 0.8), sz * 0.45);
+        drops.setMatrixAt(i, m4.compose(p4, q4, s4));
+      }
+      bottle.add(drops);
+
+      /* ── splash (landing), light tunnel, dust ── */
+      const N_SPLASH = 70;
+      const splash = new THREE.InstancedMesh(dropGeo, new THREE.MeshPhysicalMaterial({ color: 0xe6f0ff, roughness: 0.05, transparent: true, opacity: 0.45 }), N_SPLASH);
+      const splashP = Array.from({ length: N_SPLASH }, (_, i) => {
+        const th = hash(i * 5 + 3) * Math.PI * 2;
+        const up = 4 + hash(i * 7 + 9) * 6;
+        const out = 2 + hash(i * 11 + 4) * 4.5;
+        return { th, up, out, sz: 0.015 + hash(i * 17) * 0.04 };
+      });
+      scene.add(splash);
+      const rings = [];
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0x9cc0ff, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false });
+      for (let i = 0; i < 18; i++) {
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(3.2 + (i % 3) * 0.35, 0.02, 8, 128), ringMat);
+        scene.add(ring);
+        rings.push(ring);
+      }
+      const dustGeo = new THREE.BufferGeometry();
+      const dustPos = new Float32Array(600 * 3);
+      for (let i = 0; i < 600; i++) {
+        dustPos[i * 3] = (hash(i * 3 + 1) - 0.5) * 24;
+        dustPos[i * 3 + 1] = (hash(i * 3 + 2) - 0.5) * 30;
+        dustPos[i * 3 + 2] = (hash(i * 3 + 3) - 0.5) * 24;
+      }
+      dustGeo.setAttribute("position", new THREE.BufferAttribute(dustPos, 3));
+      const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ color: 0x9fbaf0, size: 0.045, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending, depthWrite: false }));
+      scene.add(dust);
+
+      /* ── shots ── */
+      const target = new THREE.Vector3();
+      function place(pos, look, fov, roll = 0) {
+        camera.position.set(...pos);
+        camera.fov = fov;
+        camera.updateProjectionMatrix();
+        target.set(...look);
+        camera.lookAt(target);
+        if (roll) camera.rotateZ(roll);
+      }
+      function resetScene() {
+        bottle.position.set(0, 0, 0);
+        bottle.rotation.set(0, 0, 0);
+        splash.visible = false;
+        rings.forEach((r) => (r.visible = false));
+        key.intensity = 3.2;
+        sweep.intensity = 0;
+      }
+      // a beat-locked strobe on the key light for the macro opener
+      const strobe = (t) => {
+        const q = ((t - CUT.A) / (BEAT / 2)) % 1;
+        return 1.2 + 2.6 * Math.exp(-q * 7);
+      };
+
+      function shotMain(t) {
+        if (t < CUT.B) {
+          const k = (t - CUT.A) / (CUT.B - CUT.A);
+          bottle.rotation.y = 0.9 + k * 0.5;
+          key.intensity = strobe(t);
+          place([lerp(1.9, 1.5, k), lerp(3.15, 2.95, k), lerp(2.7, 2.3, k)], [0, 2.6, 0], 34);
+        } else if (t < CUT.C) {
+          const k = (t - CUT.B) / (CUT.C - CUT.B);
+          bottle.rotation.y = lerp(-0.35, 0.3, k);
+          key.intensity = strobe(t);
+          place([lerp(-0.4, 0.4, k), 0.25, 3.3], [0, 0.25, 0], 34);
+        } else if (t < CUT.D) {
+          const k = (t - CUT.C) / (CUT.D - CUT.C);
+          bottle.rotation.y = lerp(0.25, -0.25, k);
+          place([0.25, -1.3, lerp(3.2, 2.8, k)], [0, -1.3, 0], 34, lerp(0.22, 0.08, k));
+        } else if (t < CUT.E) {
+          const k = (t - CUT.D) / (CUT.E - CUT.D);
+          bottle.rotation.y = k * 7.5;
+          key.intensity = 0.35;
+          place([0, -3.3, lerp(6.2, 5.6, k)], [0, 0.9, 0], 42);
+        } else if (t < CUT.F) {
+          // drop + landing
+          if (t < LAND) {
+            const k = (t - CUT.E) / (LAND - CUT.E);
+            bottle.position.y = 11 * (1 - k * k);
+            bottle.rotation.y = 3 * (1 - k);
+            bottle.rotation.z = 0.5 * (1 - k);
+          } else {
+            const d = t - LAND;
+            bottle.position.y = 0.3 * Math.exp(-d * 6) * Math.abs(Math.sin(d * 13));
+            bottle.rotation.z = -0.09 * Math.exp(-d * 4) * Math.cos(d * 12);
+            bottle.rotation.y = 0.35 * d;
+            splash.visible = d < 1.3;
+          }
+          const k = (t - CUT.E) / (CUT.F - CUT.E);
+          place([0, 1.2, lerp(15.5, 13.5, outCubic(k))], [0, 1.2, 0], 30);
+        } else if (t < CUT.G) {
+          const k = (t - CUT.F) / (CUT.G - CUT.F);
+          const th = inOutCubic(k) * Math.PI * 2 + 0.35;
+          bottle.rotation.y = 0.2;
+          place([Math.sin(th) * 12.5, 1.4 + 1.4 * Math.sin(k * Math.PI), Math.cos(th) * 12.5], [0, 1.2, 0], 30);
+        } else if (t < CUT.H) {
+          const beatIdx = Math.floor((t - CUT.G) / BEAT);
+          const q = t - CUT.G - beatIdx * BEAT;
+          bottle.rotation.y = 0.2 + (Math.PI / 2) * (beatIdx + outExpo(Math.min(1, q / 0.3)));
+          place([0, 0.6, 11.0 + 1.4 * (1 - Math.exp(-q * 6))], [0, 0.6, 0], 30);
+        } else if (t < CUT.I) {
+          return "split";
+        } else if (t < CUT.J) {
+          const k = (t - CUT.I) / (CUT.J - CUT.I);
+          const d = lerp(17, 6.0, inOutCubic(k));
+          const fov = (2 * Math.atan(7.0 / (2 * d)) * 180) / Math.PI;
+          bottle.rotation.y = 2.2 * k * Math.PI;
+          rings.forEach((r, i) => {
+            r.visible = true;
+            const L = 54;
+            r.position.set(0, 0.6, ((i * (L / rings.length) + (t - CUT.I) * 38) % L) - L + d + 2);
+            r.rotation.set(0, 0, i * 0.4);
+          });
+          place([0, 0.6, d], [0, 0.6, 0], fov, 0.18 * Math.sin(k * Math.PI));
+        } else {
+          const k = (t - CUT.J) / (DURATION - CUT.J);
+          bottle.rotation.y = -0.55 + 0.6 * k;
+          bottle.rotation.z = -0.06;
+          sweep.intensity = 40 * Math.exp(-Math.pow((k - 0.45) * 5, 2));
+          sweep.position.set(lerp(-3, 3, k), 1.2, 2.2);
+          place([0, -0.3, lerp(17, 15.5, outCubic(k))], [0, -0.75, 0], 30);
+        }
+        return "main";
+      }
+
+      function applySplash(t) {
+        if (!splash.visible) return;
+        const d = t - LAND;
+        splashP.forEach((s, i) => {
+          const r = RB + s.out * d;
+          const y = -1.95 + s.up * d - 0.5 * 16 * d * d;
+          const sz = s.sz * Math.max(0, 1 - d / 1.3);
+          p4.set(Math.sin(s.th) * r, y, Math.cos(s.th) * r);
+          s4.set(sz, sz, sz);
+          splash.setMatrixAt(i, m4.compose(p4, q4.identity(), s4));
+        });
+        splash.instanceMatrix.needsUpdate = true;
+      }
+
+      function applyShake(t) {
+        const d = t - LAND;
+        if (d < 0 || d > 0.4) return;
+        const a = 0.22 * (1 - d / 0.4);
+        const f = Math.floor(t * 30);
+        camera.position.x += (hash(f * 3) * 2 - 1) * a;
+        camera.position.y += (hash(f * 7) * 2 - 1) * a;
+      }
+
+      // Split screen: three full bottles at different angles on tricolour panels that
+      // slide in on beats 1–3 (panel colour is a scissored clear, so it slides with the panel).
+      const PANELS = [
+        { rotY: -0.5, clear: 0x2a52be },
+        { rotY: 1.6, clear: 0xe9eef6 },
+        { rotY: 3.7, clear: 0xd7263d },
+      ];
+      function renderSplit(t) {
+        renderer.setScissorTest(true);
+        renderer.setViewport(0, 0, W, H);
+        renderer.setScissor(0, 0, W, H);
+        renderer.setClearColor(0x000000, 0);
+        renderer.clear();
+        const pw = W / 3;
+        PANELS.forEach((p, i) => {
+          const k = clamp01((t - CUT.H - i * BEAT) / 0.3);
+          if (k <= 0) return;
+          const y = Math.round((1 - outExpo(k)) * H * (i % 2 ? -1 : 1));
+          bottle.position.set(0, 0, 0);
+          bottle.rotation.set(0, p.rotY + 1.2 * (t - CUT.H), i === 1 ? 0.0 : (i === 0 ? 0.08 : -0.08));
+          camera.aspect = pw / H;
+          place([0, 0.55, 15.5], [0, 0.55, 0], 34);
+          renderer.setViewport(i * pw, y, pw, H);
+          renderer.setScissor(i * pw, y, pw, H);
+          renderer.setClearColor(p.clear, 1);
+          renderer.clear();
+          renderer.render(scene, camera);
+        });
+        renderer.setScissorTest(false);
+        renderer.setClearColor(0x000000, 0);
+        camera.aspect = W / H;
+      }
+
+      function renderAt(t) {
+        resetScene();
+        dust.position.y = -t * 0.6;
+        dust.rotation.y = t * 0.05;
+        const mode = shotMain(t);
+        if (mode === "split") {
+          renderSplit(t);
+          return;
+        }
+        applySplash(t);
+        applyShake(t);
+        renderer.setViewport(0, 0, W, H);
+        renderer.render(scene, camera);
+      }
+      renderAt(0);
+
+      /* ═════════ GSAP: drive the 3D clock + overlays/transitions ═════════ */
+      const tl = gsap.timeline({ paused: true });
+      const clock = { t: 0 };
+      tl.fromTo(clock, { t: 0 }, { t: DURATION, duration: DURATION, ease: "none", onUpdate: () => renderAt(clock.t) }, 0);
+
+      // Flash cut (white frame decaying) and RGB-split burst helpers.
+      const flashCut = (at, peak = 0.9, dur = 0.2) => {
+        tl.set("#flash", { opacity: peak }, at);
+        tl.to("#flash", { opacity: 0, duration: dur, ease: "power2.out" }, at);
+      };
+      const rgbEl = document.getElementById("fx-rgb");
+      const rgbBurst = (at, dur, px) => {
+        const amp = { a: 0 };
+        tl.fromTo(
+          amp,
+          { a: 1 },
+          {
+            a: 0,
+            duration: dur,
+            ease: "power2.in",
+            immediateRender: false,
+            onUpdate: () => {
+              const step = Math.floor(tl.time() * 30);
+              const j = (hash(step * 13) * 0.6 + 0.4) * px * amp.a;
+              const jx = (hash(step * 29) * 2 - 1) * px * 0.8 * amp.a;
+              rgbEl.style.filter = `drop-shadow(${j.toFixed(1)}px 0 0 rgba(255,30,70,0.75)) drop-shadow(${(-j).toFixed(1)}px 0 0 rgba(0,190,255,0.75))`;
+              rgbEl.style.transform = `translateX(${jx.toFixed(1)}px)`;
+            },
+          },
+          at,
+        );
+        tl.set(rgbEl, { filter: "none", x: 0 }, at + dur);
+      };
+      const punch = (at, from = 1.12) => tl.fromTo("#fx-blur", { scale: from }, { scale: 1, duration: 0.35, ease: "expo.out", immediateRender: false }, at);
+
+      // opener: words slam on the beat over the macros
+      const WORDS = [CUT.B, CUT.C, bar(1, 2)];
+      const WFROM = [
+        { scale: 1.7, filter: "blur(14px)", opacity: 0 },
+        { x: -300, filter: "blur(10px)", opacity: 0 },
+        { y: 140, filter: "blur(10px)", opacity: 0 },
+      ];
+      WORDS.forEach((at, i) => {
+        tl.fromTo(`#w${i}`, WFROM[i], { scale: 1, x: 0, y: 0, filter: "blur(0px)", opacity: 1, duration: 0.35, ease: "power4.out" }, at);
+        if (i > 0) tl.set(`#w${i - 1}`, { opacity: 0 }, at);
+      });
+      tl.set("#w2", { opacity: 0 }, CUT.E);
+
+      [CUT.B, CUT.C, CUT.D].forEach((at) => {
+        flashCut(at, 0.85, 0.16);
+        rgbBurst(at, 0.18, 22);
+        punch(at);
+      });
+      tl.fromTo("#fx-blur", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 0);
+
+      // drop: hard cut to black then landing flash + glitch
+      tl.set("#flash", { opacity: 0 }, CUT.E);
+      flashCut(LAND, 1, 0.45);
+      rgbBurst(LAND, 0.35, 34);
+      punch(LAND, 1.18);
+
+      // orbit: horizontal motion blur peaks mid-orbit; wordmark
+      const blurNode = document.getElementById("hblur-node");
+      const hb = { v: 0 };
+      const writeHB = () => blurNode.setAttribute("stdDeviation", `${hb.v.toFixed(2)} 0`);
+      writeHB();
+      tl.to(hb, { v: 9, duration: BAR / 2, ease: "power2.in", onUpdate: writeHB }, CUT.F);
+      tl.to(hb, { v: 0, duration: BAR / 2, ease: "power2.out", onUpdate: writeHB }, CUT.F + BAR / 2);
+      gsap.utils.toArray("#mark").forEach((el) => {
+        tl.fromTo(el, { y: -40, opacity: 0, filter: "blur(10px)" }, { y: 0, opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "expo.out" }, bar(2, 2));
+      });
+      tl.to("#mark", { opacity: 0, duration: 0.15, ease: "none" }, CUT.G - 0.15);
+      flashCut(CUT.F, 0.6, 0.18);
+
+      // snap spins: tricolour strobe behind the bottle on every beat
+      const bgFlash = document.getElementById("bg-flash");
+      ["#2a52be", "#eef3fa", "#d7263d", "#2a52be"].forEach((c, i) => {
+        const at = bar(4, i);
+        tl.set(bgFlash, { backgroundColor: c, opacity: c === "#eef3fa" ? 0.35 : 0.6 }, at);
+        tl.to(bgFlash, { opacity: 0, duration: 0.32, ease: "power2.out" }, at);
+        punch(at, 1.06);
+      });
+      rgbBurst(CUT.G, 0.2, 26);
+
+      // split screen
+      tl.set("#split-lines", { opacity: 1 }, CUT.H);
+      tl.set("#split-lines", { opacity: 0 }, CUT.I);
+      [0, 1, 2].forEach((i) => {
+        tl.fromTo(`#sl-${i}`, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "expo.out" }, CUT.H + i * BEAT + 0.15);
+        tl.set(`#sl-${i}`, { opacity: 0 }, CUT.I);
+      });
+
+      // tunnel: glitch in
+      rgbBurst(CUT.I, 0.3, 40);
+      flashCut(CUT.I, 0.7, 0.2);
+
+      // end: tricolour block wipe covers the cut, then the lockup
+      [0, 1, 2].forEach((i) => {
+        tl.fromTo(`#wipe-${i}`, { y: 0 }, { y: -1920, duration: 0.24, ease: "power3.in", immediateRender: false }, CUT.J - 0.26 + i * 0.05);
+        tl.to(`#wipe-${i}`, { y: -3840, duration: 0.26, ease: "power3.out" }, CUT.J + 0.02 + i * 0.05);
+      });
+      tl.fromTo("#end-mark", { y: 40, opacity: 0, filter: "blur(12px)" }, { y: 0, opacity: 1, filter: "blur(0px)", duration: 0.5, ease: "power3.out" }, bar(7, 1));
+      tl.fromTo("#end-tag", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.5, ease: "power3.out" }, bar(7, 2));
+      tl.fromTo("#end-tri i", { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power3.out", stagger: 0.08 }, bar(7, 3));
+      tl.to("#fade", { opacity: 1, duration: 0.35, ease: "power1.in" }, DURATION - 0.35);
+
+      window.__timelines["main"] = tl;
+      window.__sceneReady();
+    </script>
+  </body>
+</html>
