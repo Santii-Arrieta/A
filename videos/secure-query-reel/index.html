@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <!-- Vendored locally (cdn.jsdelivr.net is blocked in this environment) -->
+    <script src="vendor/gsap.min.js"></script>
+    <script type="importmap">
+      { "imports": { "three": "./vendor/three.module.js" } }
+    </script>
+    <script>
+      window.__hf = window.__hf || {};
+      window.__hf.buildReady = window.__hf.buildReady || {};
+      window.__hf.buildReady["secure-query"] = new Promise((r) => (window.__built = r));
+    </script>
+    <style>
+      /* Fonts from the pdoom-video repo (SIL OFL, see assets/fonts/OFL.txt) */
+      @font-face {
+        font-family: "ArchivoV";
+        src: url("assets/fonts/Archivo-VF.ttf");
+        font-weight: 100 900;
+        font-stretch: 62% 125%;
+      }
+      @font-face {
+        font-family: "CormorantI";
+        src: url("assets/fonts/CormorantItalic-VF.ttf");
+        font-weight: 300 700;
+        font-style: italic;
+      }
+      @font-face {
+        font-family: "PlexMono";
+        src: url("assets/fonts/IBMPlexMono-Regular.ttf");
+        font-weight: 400;
+      }
+      @font-face {
+        font-family: "PlexMono";
+        src: url("assets/fonts/IBMPlexMono-Medium.ttf");
+        font-weight: 500;
+      }
+      :root {
+        --ink: #0a0a0b;
+        --ink2: #151517;
+        --graphite: #5e5b57;
+        --ash: #9c978f;
+        --bone: #eee9df;
+        --signal: #ff4d12;
+        --ember: #ff8a3d;
+        --blood: #c21d0b;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #0a0a0b;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #0a0a0b;
+        color: #eee9df;
+        font-family: "PlexMono", monospace;
+      }
+      .full {
+        position: absolute;
+        inset: 0;
+      }
+      #stage {
+        position: absolute;
+        inset: 0;
+      }
+      #three {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+      }
+      .plate {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+      }
+      #p1 {
+        opacity: 1;
+      }
+      .mono {
+        font-family: "PlexMono", monospace;
+      }
+      .disp {
+        font-family: "ArchivoV", sans-serif;
+        font-weight: 900;
+        font-stretch: 125%;
+        text-transform: uppercase;
+        letter-spacing: -0.01em;
+        line-height: 0.9;
+      }
+      .cond {
+        font-stretch: 62%;
+      }
+      .serif {
+        font-family: "CormorantI", serif;
+        font-style: italic;
+        font-weight: 500;
+      }
+      .ash {
+        color: #9c978f;
+      }
+      .sig {
+        color: #ff4d12;
+      }
+      .glow {
+        text-shadow: 0 0 18px rgba(255, 77, 18, 0.55);
+      }
+      .abs {
+        position: absolute;
+      }
+      .label {
+        font-size: 22px;
+        letter-spacing: 0.08em;
+        color: #9c978f;
+      }
+      svg.layer {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: visible;
+      }
+      .ln {
+        fill: none;
+        stroke: #eee9df;
+        stroke-width: 2;
+      }
+      .ln-dim {
+        fill: none;
+        stroke: #5e5b57;
+        stroke-width: 1.5;
+      }
+      .ln-sig {
+        fill: none;
+        stroke: #ff4d12;
+        stroke-width: 3;
+        filter: drop-shadow(0 0 6px rgba(255, 77, 18, 0.8));
+      }
+      .spark {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 18px;
+        height: 18px;
+        margin: -9px 0 0 -9px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #fff3e6 0%, #ff8a3d 40%, #ff4d12 70%);
+        box-shadow: 0 0 22px 8px rgba(255, 77, 18, 0.7), 0 0 60px 20px rgba(255, 77, 18, 0.25);
+        opacity: 0;
+      }
+      .panel {
+        position: absolute;
+        background: rgba(10, 10, 11, 0.93);
+        border: 1.5px solid #5e5b57;
+        padding: 26px 30px;
+      }
+      .reveal {
+        opacity: 0;
+      }
+
+      /* P1 */
+      #p1-grid {
+        background-image: repeating-linear-gradient(0deg, rgba(238, 233, 223, 0.07) 0 1.5px, transparent 1.5px 120px),
+          repeating-linear-gradient(90deg, rgba(238, 233, 223, 0.07) 0 1.5px, transparent 1.5px 120px);
+        opacity: 0;
+      }
+      .crop {
+        position: absolute;
+        width: 56px;
+        height: 56px;
+        border-color: #eee9df;
+        border-style: solid;
+        border-width: 0;
+      }
+      /* P4 paper */
+      #p4 {
+        background: #eee9df;
+        color: #0a0a0b;
+      }
+      #p4 .label {
+        color: #5e5b57;
+      }
+      .code {
+        font-family: "PlexMono", monospace;
+        font-size: 27px;
+        line-height: 1.5;
+        white-space: pre;
+      }
+      .card {
+        position: absolute;
+        border: 2px solid #0a0a0b;
+        padding: 26px 30px;
+        background: #f5f1e9;
+      }
+      .hl {
+        background: #ff4d12;
+        color: #0a0a0b;
+        padding: 0 4px;
+      }
+      #stamp {
+        position: absolute;
+        left: 1150px;
+        top: 650px;
+        padding: 14px 30px;
+        border: 7px solid #ff4d12;
+        color: #ff4d12;
+        font-family: "ArchivoV", sans-serif;
+        font-weight: 900;
+        font-stretch: 100%;
+        font-size: 74px;
+        letter-spacing: 0.02em;
+        opacity: 0;
+        mix-blend-mode: multiply;
+      }
+      /* P6 / P7 */
+      .tlabel {
+        position: absolute;
+        left: 0;
+        top: 0;
+        font-size: 26px;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+      }
+      .block {
+        position: absolute;
+        width: 112px;
+        height: 72px;
+        border: 1.5px solid #5e5b57;
+        font-size: 13px;
+        line-height: 1.35;
+        padding: 6px 7px;
+        color: #9c978f;
+        overflow: hidden;
+        white-space: pre;
+      }
+      #log div {
+        font-size: 22px;
+        line-height: 1.6;
+        white-space: pre;
+        opacity: 0;
+      }
+      /* HUD */
+      #hud {
+        position: absolute;
+        inset: 0;
+        z-index: 50;
+        pointer-events: none;
+        font-size: 19px;
+        letter-spacing: 0.08em;
+        color: #9c978f;
+      }
+      #hud .h {
+        position: absolute;
+      }
+      #risk-bar {
+        width: 220px;
+        height: 6px;
+        background: #151517;
+        border: 1px solid #5e5b57;
+        margin-top: 8px;
+      }
+      #risk-fill {
+        width: 100%;
+        height: 100%;
+        background: #ff4d12;
+        transform-origin: left center;
+      }
+      #grain {
+        position: absolute;
+        inset: 0;
+        z-index: 60;
+        pointer-events: none;
+        overflow: hidden;
+        mix-blend-mode: overlay;
+      }
+      #grain div {
+        position: absolute;
+        left: -50%;
+        top: -50%;
+        width: 200%;
+        height: 200%;
+        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        opacity: 0.38;
+      }
+      #vignette {
+        position: absolute;
+        inset: 0;
+        z-index: 55;
+        pointer-events: none;
+        background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.55) 100%);
+      }
+      #flash {
+        position: absolute;
+        inset: 0;
+        z-index: 70;
+        background: #eee9df;
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="30" data-width="1920" data-height="1080">
+      <div id="stage">
+        <canvas id="three" width="1920" height="1080"></canvas>
+
+        <!-- PLATE 01 — DEPARTURE -->
+        <div class="plate" id="p1">
+          <div id="p1-grid" class="full"></div>
+          <div class="crop" id="c-tl" style="left: 34px; top: 34px; border-width: 3px 0 0 3px"></div>
+          <div class="crop" id="c-tr" style="right: 34px; top: 34px; border-width: 3px 3px 0 0"></div>
+          <div class="crop" id="c-bl" style="left: 34px; bottom: 34px; border-width: 0 0 3px 3px"></div>
+          <div class="crop" id="c-br" style="right: 34px; bottom: 34px; border-width: 0 3px 3px 0"></div>
+          <svg class="layer" id="p1-svg" viewBox="0 0 1920 1080">
+            <defs>
+              <pattern id="hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)">
+                <line x1="0" y1="0" x2="0" y2="9" stroke="#eee9df" stroke-width="1.6" />
+              </pattern>
+              <clipPath id="dbclip"><rect x="1490" y="330" width="150" height="350" /></clipPath>
+            </defs>
+            <!-- APP: a window glyph -->
+            <path class="ln draw" d="M 300 380 H 600 V 640 H 300 Z" />
+            <path class="ln draw" d="M 300 420 H 600" />
+            <path class="ln-dim draw" d="M 330 470 H 470 M 330 505 H 540 M 350 540 H 500 M 350 575 H 450" />
+            <!-- DB: an engraved cylinder -->
+            <path class="ln draw" d="M 1360 360 A 140 36 0 1 0 1640 360 A 140 36 0 1 0 1360 360" />
+            <path class="ln draw" d="M 1360 360 V 660 A 140 36 0 0 0 1640 660 V 360" />
+            <path class="ln-dim draw" d="M 1360 460 A 140 36 0 0 0 1640 460 M 1360 560 A 140 36 0 0 0 1640 560" />
+            <rect id="db-hatch" x="1490" y="378" width="150" height="316" fill="url(#hatch)" opacity="0" clip-path="url(#dbclip)" />
+            <!-- the route -->
+            <path class="ln-dim" id="route" d="M 600 510 H 1360" stroke-dasharray="4 12" />
+            <path class="ln-sig" id="p1-trail" d="M 600 510 H 980" />
+          </svg>
+          <div class="abs label" id="p1-app-l" style="left: 300px; top: 660px">CLIENT APPLICATION</div>
+          <div class="abs label" id="p1-db-l" style="left: 1360px; top: 720px">DATABASE</div>
+          <div class="spark" id="p1-spark"></div>
+          <div class="abs disp" id="p1-title" style="left: 140px; top: 800px; font-size: 128px">The Safe Query</div>
+          <div class="abs serif" id="p1-sub" style="left: 146px; top: 935px; font-size: 44px; color: #9c978f">
+            a field manual for data in motion, in eight plates
+          </div>
+        </div>
+
+        <!-- PLATE 02 — HANDSHAKE -->
+        <div class="plate" id="p2">
+          <div id="p2-zoom" class="full">
+            <svg class="layer" id="p2-svg" viewBox="0 0 1920 1080">
+              <path class="ln draw" d="M 470 160 H 750 V 230 H 470 Z" />
+              <path class="ln draw" d="M 1190 160 H 1470 V 230 H 1190 Z" />
+              <path class="ln-dim draw" d="M 610 230 V 900" stroke-dasharray="6 10" />
+              <path class="ln-dim draw" d="M 1330 230 V 900" stroke-dasharray="6 10" />
+              <path class="ln arrow" id="a0" d="M 610 330 H 1330 M 1310 320 L 1330 330 L 1310 340" />
+              <path class="ln arrow" id="a1" d="M 1330 430 H 610 M 630 420 L 610 430 L 630 440" />
+              <path class="ln arrow" id="a2" d="M 1330 530 H 610 M 630 520 L 610 530 L 630 540" />
+              <path class="ln arrow" id="a3" d="M 610 630 H 1330 M 1310 620 L 1330 630 L 1310 640" />
+              <path class="ln-sig" id="ecdh-l" d="M 610 760 C 720 700, 860 700, 960 760" />
+              <path class="ln-sig" id="ecdh-r" d="M 1330 760 C 1220 700, 1060 700, 960 760" />
+              <g id="lock">
+                <path class="ln-sig" id="lock-shackle" d="M 925 860 V 830 A 35 35 0 0 1 995 830 V 860" />
+                <path class="ln-sig" id="lock-body" d="M 905 860 H 1015 V 950 H 905 Z" />
+                <path class="ln-sig" id="lock-hole" d="M 960 893 V 918" />
+              </g>
+            </svg>
+            <div class="abs mono" style="left: 470px; top: 176px; width: 280px; text-align: center; font-size: 24px; letter-spacing: 0.12em">
+              APPLICATION
+            </div>
+            <div class="abs mono" style="left: 1190px; top: 176px; width: 280px; text-align: center; font-size: 24px; letter-spacing: 0.12em">
+              DATABASE
+            </div>
+            <div class="abs mono reveal" id="t0" style="left: 640px; top: 290px; font-size: 23px">
+              ClientHello · key_share · supported_versions: TLS 1.3
+            </div>
+            <div class="abs mono reveal" id="t1" style="left: 640px; top: 390px; font-size: 23px">ServerHello · key_share</div>
+            <div class="abs mono reveal" id="t2" style="left: 640px; top: 490px; font-size: 23px">
+              {EncryptedExtensions} {Certificate} {CertificateVerify} {Finished}
+            </div>
+            <div class="abs mono reveal" id="t3" style="left: 640px; top: 590px; font-size: 23px">{Finished}</div>
+            <div class="abs mono reveal sig" id="t4" style="left: 640px; top: 688px; width: 640px; text-align: center; font-size: 22px">
+              ECDHE → shared secret → HKDF → traffic keys
+            </div>
+            <div class="abs mono reveal" id="t5" style="left: 1060px; top: 890px; font-size: 24px">TLS 1.3 · 1-RTT</div>
+            <div class="spark" id="p2-spark"></div>
+          </div>
+          <div class="abs disp cond" id="p2-title" style="left: 120px; top: 836px; font-size: 150px">Handshake</div>
+        </div>
+
+        <!-- PLATE 03 — IN TRANSIT (3D tunnel behind) -->
+        <div class="plate" id="p3">
+          <div class="full" style="background: linear-gradient(to top, rgba(10,10,11,0.95) 0%, rgba(10,10,11,0.75) 22%, rgba(10,10,11,0) 45%)"></div>
+          <div class="panel" style="left: 120px; top: 150px; width: 1500px">
+            <div class="label">PLAINTEXT · INSIDE THE APP</div>
+            <div class="mono" id="p3-plain" style="font-size: 36px; margin-top: 10px; white-space: pre"></div>
+            <div class="label" style="margin-top: 26px">ON THE WIRE · AES-256-GCM · 96-BIT NONCE · 128-BIT TAG</div>
+            <div class="mono sig glow" id="p3-cipher" style="font-size: 27px; margin-top: 10px; line-height: 1.45; white-space: pre"></div>
+          </div>
+          <div class="panel" id="p3-tap" style="left: 1240px; top: 640px; width: 560px; opacity: 0">
+            <div class="label">TAP · TCP 5432 · EAVESDROPPER VIEW</div>
+            <div class="mono ash" id="p3-tapdump" style="font-size: 21px; margin-top: 10px; line-height: 1.45; white-space: pre"></div>
+            <div class="serif" style="font-size: 32px; margin-top: 10px">no key, no plaintext.</div>
+          </div>
+          <div class="abs disp" id="p3-title" style="left: 120px; top: 836px; font-size: 140px">In Transit</div>
+        </div>
+
+        <!-- PLATE 04 — INJECTION (paper) -->
+        <div class="plate" id="p4">
+          <div class="abs mono" style="left: 120px; top: 100px; font-size: 22px; letter-spacing: 0.12em; color: #5e5b57">
+            FORM 7-Q · QUERY INTAKE · DEPT. OF INPUT HANDLING
+          </div>
+          <div class="abs" style="left: 120px; top: 138px; width: 1680px; height: 3px; background: #0a0a0b"></div>
+          <div class="abs label" style="left: 120px; top: 162px">FIELD 1 · EMAIL</div>
+          <div class="abs" style="left: 120px; top: 196px; width: 1100px; height: 76px; border: 2px solid #0a0a0b; background: #f5f1e9"></div>
+          <div class="abs mono" id="p4-input" style="left: 142px; top: 210px; font-size: 36px; white-space: pre"></div>
+          <div class="card" id="cardA" style="left: 120px; top: 320px; width: 820px; height: 420px">
+            <div class="label">A · STRING CONCATENATION</div>
+            <div class="code" style="margin-top: 14px">query = "SELECT * FROM users
+  WHERE email = '" + input + "'"</div>
+            <div class="code" id="p4-a-res" style="margin-top: 22px; opacity: 0">→ … WHERE email = '' <span class="hl">OR '1'='1'</span> --'
+→ every row comes back</div>
+            <svg width="760" height="200" style="position: absolute; left: 30px; top: 110px; overflow: visible">
+              <path id="strike" d="M 0 160 L 760 20" fill="none" stroke="#ff4d12" stroke-width="9" />
+            </svg>
+          </div>
+          <div class="card" id="cardB" style="left: 980px; top: 320px; width: 820px; height: 420px; opacity: 0">
+            <div class="label">B · PARAMETERIZED</div>
+            <div class="code" style="margin-top: 14px">SELECT * FROM users
+  WHERE email = $1
+params: [ "' OR '1'='1' --" ]</div>
+            <div class="code" id="p4-b-res" style="margin-top: 22px; opacity: 0">→ 0 rows · the input stayed a value</div>
+          </div>
+          <div id="stamp">BOUND AS DATA</div>
+          <div class="abs disp" id="p4-title" style="left: 120px; top: 826px; font-size: 150px; color: #0a0a0b">Injection</div>
+        </div>
+
+        <!-- PLATE 05 — HASHED -->
+        <div class="plate" id="p5">
+          <canvas id="guilloche" width="900" height="900" style="position: absolute; left: 1020px; top: 40px; width: 900px; height: 900px"></canvas>
+          <div class="abs mono" style="left: 120px; top: 170px; font-size: 32px; line-height: 2">
+            <div class="reveal" id="h0"><span class="ash">password </span> hunter2</div>
+            <div class="reveal" id="h1"><span class="ash">+ salt   </span> D7WwBTXwBwUodIn1xuUOPu</div>
+            <div class="reveal" id="h2"><span class="ash">bcrypt   </span> cost 12 → 2<sup>12</sup> key-setup rounds</div>
+            <div class="reveal" id="h3"><span class="ash">rounds   </span> <span id="h-count" class="sig">0000</span> / 4096</div>
+          </div>
+          <div class="abs reveal" id="h-slab" style="left: 120px; top: 640px">
+            <div class="mono" style="font-size: 44px; letter-spacing: 0.01em"><span class="sig">$2b$</span><span>12$</span><span class="ash">D7WwBTXwBwUodIn1xuUOPu</span><span>xDO8YsGORzLha2mqyCoKLwkhBaD7o5O</span></div>
+            <div class="mono" style="font-size: 18px; color: #5e5b57; margin-top: 8px; white-space: pre">algorithm  cost  salt · 22 chars                    hash · 31 chars</div>
+          </div>
+          <div class="abs serif reveal" id="h-cap" style="left: 124px; top: 770px; font-size: 40px; color: #9c978f">
+            the server keeps the hash, never the password.
+          </div>
+          <div class="abs disp" id="p5-title" style="left: 120px; top: 836px; font-size: 140px">Hashed</div>
+        </div>
+
+        <!-- PLATE 06 — LEAST PRIVILEGE (3D DB behind) -->
+        <div class="plate" id="p6">
+          <div class="full" style="background: linear-gradient(to top, rgba(10,10,11,0.9) 0%, rgba(10,10,11,0) 35%)"></div>
+          <div class="panel" style="left: 120px; top: 230px; width: 600px">
+            <div class="label">ROLE</div>
+            <div class="mono" style="font-size: 38px; margin: 6px 0 16px">app_reader</div>
+            <div class="code" style="font-size: 23px; color: #9c978f">GRANT SELECT
+  ON users, orders
+  TO app_reader;</div>
+          </div>
+          <svg class="layer" id="p6-svg" viewBox="0 0 1920 1080"></svg>
+          <div class="tlabel" id="tl-0">users <span class="sig" id="ok-0" style="opacity: 0">✓ SELECT</span></div>
+          <div class="tlabel" id="tl-1">orders <span class="sig" id="ok-1" style="opacity: 0">✓ SELECT</span></div>
+          <div class="tlabel" id="tl-2">payments <span id="ok-2" style="opacity: 0; color: #ff4d12">✕</span></div>
+          <div class="panel mono" id="p6-err" style="left: 120px; top: 640px; width: 900px; font-size: 26px; opacity: 0; border-color: #ff4d12">
+            <span class="sig">ERROR:</span>&nbsp; permission denied for table payments
+          </div>
+          <div class="abs disp cond" id="p6-title" style="left: 120px; top: 836px; font-size: 150px">Least Privilege</div>
+        </div>
+
+        <!-- PLATE 07 — AT REST / AUDITED -->
+        <div class="plate" id="p7">
+          <div id="blocks"></div>
+          <svg class="layer" id="p7-svg" viewBox="0 0 1920 1080">
+            <circle id="key-ring" cx="1430" cy="300" r="120" class="ln-dim" />
+            <circle id="key-pulse" cx="1430" cy="300" r="120" fill="none" stroke="#ff4d12" stroke-width="3" opacity="0" />
+            <g id="key" style="transform-origin: 1430px 300px">
+              <circle cx="1385" cy="300" r="34" class="ln-sig" />
+              <path class="ln-sig" d="M 1419 300 H 1500 M 1475 300 V 325 M 1495 300 V 318" />
+            </g>
+          </svg>
+          <div class="abs mono" id="key-label" style="left: 1310px; top: 440px; width: 240px; text-align: center; font-size: 24px">KMS · DEK v1</div>
+          <div class="abs label" style="left: 1240px; top: 480px; width: 380px; text-align: center">envelope encryption · rotation</div>
+          <div class="panel" id="log" style="left: 1080px; top: 560px; width: 760px; height: 300px">
+            <div class="label" style="opacity: 1; font-size: 20px; margin-bottom: 4px">AUDIT LOG</div>
+          </div>
+          <div class="abs disp" id="p7-title" style="left: 120px; top: 836px; font-size: 140px">At Rest · <span class="sig">Audited</span></div>
+        </div>
+
+        <!-- PLATE 08 — HANDLED -->
+        <div class="plate" id="p8">
+          <svg class="layer" id="p8-svg" viewBox="0 0 1920 1080">
+            <path class="ln-sig" id="p8-line" d="M 160 540 H 1760" />
+          </svg>
+          <div class="spark" id="p8-spark"></div>
+          <div class="abs disp" id="w-data" style="left: 150px; top: 300px; font-size: 230px; opacity: 0">Data,</div>
+          <div class="abs disp sig glow" id="w-handled" style="left: 150px; top: 520px; font-size: 230px; opacity: 0">Handled.</div>
+          <div class="abs mono" id="w-sign" style="left: 156px; top: 790px; font-size: 26px; letter-spacing: 0.16em; opacity: 0">CLAUDE — MOTION DESIGN REEL</div>
+          <div class="abs serif" id="w-cap" style="left: 156px; top: 838px; font-size: 40px; color: #9c978f; opacity: 0">
+            eight plates · thirty seconds · one safe query
+          </div>
+          <div class="crop" id="e-tl" style="left: 34px; top: 34px; border-width: 3px 0 0 3px; opacity: 0"></div>
+          <div class="crop" id="e-tr" style="right: 34px; top: 34px; border-width: 3px 3px 0 0; opacity: 0"></div>
+          <div class="crop" id="e-bl" style="left: 34px; bottom: 34px; border-width: 0 0 3px 3px; opacity: 0"></div>
+          <div class="crop" id="e-br" style="right: 34px; bottom: 34px; border-width: 0 3px 3px 0; opacity: 0"></div>
+        </div>
+      </div>
+
+      <div id="vignette"></div>
+      <div id="hud">
+        <div class="h" id="hud-plate" style="left: 120px; top: 54px">PLATE 01 / 08 — DEPARTURE</div>
+        <div class="h" style="right: 120px; top: 44px; text-align: right">
+          RESIDUAL RISK* <span id="hud-risk" class="sig">0.92</span>
+          <div id="risk-bar"><div id="risk-fill"></div></div>
+        </div>
+        <div class="h" id="hud-tc" style="left: 120px; bottom: 26px">00:00:00</div>
+        <div class="h" style="right: 120px; bottom: 26px">*ILLUSTRATIVE · 128 BPM · 1920×1080</div>
+      </div>
+      <div id="grain" data-layout-ignore><div></div></div>
+      <div id="flash"></div>
+
+      <audio id="reel-audio" src="assets/audio/secure-query.wav" data-start="0" data-duration="30" data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script type="module">
+      import * as THREE from "three";
+
+      const W = 1920,
+        H = 1080,
+        DURATION = 30;
+      const BPM = 128;
+      const BEAT = 60 / BPM;
+      const BAR = 4 * BEAT; // 1.875 s — 16 bars = 30 s
+      const bar = (b, beat = 0) => b * BAR + beat * BEAT;
+      const PLATE = (n) => bar(2 * (n - 1)); // each plate is 2 bars
+      const hash = (n) => {
+        const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+        return x - Math.floor(x);
+      };
+      // genuine values from scripts/crypto.py (bcrypt cost 12 of "hunter2"; AES-256-GCM of the query, demo key)
+      const crypto = {"plaintext": "SELECT id, email FROM users WHERE id = 42;", "ciphertext_hex": "d9e6ec63e92e6f7222277db8167ce0532d66921e92391f072bad7751e9c120ade870a822e1e969561460e0278d3ca2e1d3355f22a50e83f4419a", "bcrypt": "$2b$12$D7WwBTXwBwUodIn1xuUOPuxDO8YsGORzLha2mqyCoKLwkhBaD7o5O"};
+      await document.fonts.ready;
+
+      const tl = gsap.timeline({ paused: true });
+      const $ = (s) => document.querySelector(s);
+
+      /* ── helpers ── */
+      const prepDraw = (el) => {
+        const len = el.getTotalLength() * 1.02;
+        el.style.strokeDasharray = `${len}`;
+        el.style.strokeDashoffset = `${len}`;
+        return len;
+      };
+      const draw = (el, at, dur, ease = "power2.out") => {
+        prepDraw(el);
+        tl.to(el, { strokeDashoffset: 0, duration: dur, ease }, at);
+      };
+      const typeOn = (el, text, at, dur, caret = true) => {
+        const st = { n: 0 };
+        const write = () => {
+          const n = Math.round(st.n);
+          el.textContent = text.slice(0, n) + (caret && n < text.length ? "▍" : "");
+        };
+        write();
+        tl.to(st, { n: text.length, duration: dur, ease: "none", onUpdate: write }, at);
+      };
+      const GLYPHS = "0123456789abcdef";
+      const scrambleTo = (el, text, at, dur) => {
+        const st = { p: 0 };
+        const write = () => {
+          const step = Math.floor(tl.time() * 30);
+          let out = "";
+          for (let i = 0; i < text.length; i++) {
+            const c = text[i];
+            if (c === " " || c === "\n") out += c;
+            else if (i / text.length < st.p) out += c;
+            else out += GLYPHS[Math.floor(hash(step * 31 + i * 7) * 16)];
+          }
+          el.textContent = st.p <= 0 ? "" : out;
+        };
+        write();
+        tl.to(st, { p: 1, duration: dur, ease: "power1.inOut", onUpdate: write }, at);
+      };
+      const pop = (sel, at, from = { y: 24, opacity: 0 }, dur = 0.35) =>
+        tl.fromTo(sel, from, { y: 0, x: 0, scale: 1, opacity: 1, filter: "blur(0px)", duration: dur, ease: "power3.out" }, at);
+      // a spark riding a path: position from getPointAtLength, seek-safe
+      const rideSpark = (spark, path, at, dur, ease = "power2.inOut", keep = true) => {
+        const len = path.getTotalLength();
+        const st = { p: 0 };
+        const put = () => {
+          const pt = path.getPointAtLength(len * Math.min(1, st.p));
+          spark.style.transform = `translate(${pt.x}px, ${pt.y}px)`;
+        };
+        tl.set(spark, { opacity: 1 }, at);
+        tl.fromTo(st, { p: 0 }, { p: 1, duration: dur, ease, immediateRender: false, onUpdate: put }, at);
+        if (!keep) tl.set(spark, { opacity: 0 }, at + dur + 0.02);
+      };
+      const flash = (at, peak = 0.75, dur = 0.18) => {
+        tl.set("#flash", { opacity: peak }, at);
+        tl.to("#flash", { opacity: 0, duration: dur, ease: "power2.out" }, at);
+      };
+      const stageEl = $("#stage");
+      const caBurst = (at, dur = 0.22, px = 14) => {
+        const amp = { a: 0 };
+        tl.fromTo(
+          amp,
+          { a: 1 },
+          {
+            a: 0,
+            duration: dur,
+            ease: "power2.in",
+            immediateRender: false,
+            onUpdate: () => {
+              const s = Math.floor(tl.time() * 30);
+              const j = (0.4 + hash(s * 13) * 0.6) * px * amp.a;
+              stageEl.style.filter = `drop-shadow(${j.toFixed(1)}px 0 0 rgba(255,40,40,0.55)) drop-shadow(${(-j).toFixed(1)}px 0 0 rgba(40,160,255,0.55))`;
+              stageEl.style.transform = `translateX(${((hash(s * 7) * 2 - 1) * px * 0.6 * amp.a).toFixed(1)}px)`;
+            },
+          },
+          at,
+        );
+        tl.set(stageEl, { filter: "none", x: 0 }, at + dur);
+      };
+      const shake = (at, dur = 0.3, px = 16) => {
+        const amp = { a: 0 };
+        tl.fromTo(
+          amp,
+          { a: 1 },
+          {
+            a: 0,
+            duration: dur,
+            ease: "power2.out",
+            immediateRender: false,
+            onUpdate: () => {
+              const s = Math.floor(tl.time() * 30);
+              stageEl.style.transform = `translate(${((hash(s * 3) * 2 - 1) * px * amp.a).toFixed(1)}px, ${((hash(s * 5) * 2 - 1) * px * amp.a).toFixed(1)}px)`;
+            },
+          },
+          at,
+        );
+        tl.set(stageEl, { x: 0, y: 0 }, at + dur);
+      };
+      const cut = (from, to, at) => {
+        tl.set(from, { opacity: 0 }, at);
+        tl.set(to, { opacity: 1 }, at);
+      };
+
+      /* ── HUD: plate labels, risk meter, timecode, grain ── */
+      const PLATES = ["DEPARTURE", "HANDSHAKE", "IN TRANSIT", "INJECTION", "HASHED", "LEAST PRIVILEGE", "AT REST · AUDITED", "HANDLED"];
+      const RISK = [0.92, 0.64, 0.38, 0.21, 0.12, 0.06, 0.03, 0.01];
+      const hudPlate = $("#hud-plate"),
+        hudRisk = $("#hud-risk"),
+        hudTc = $("#hud-tc"),
+        grain = $("#grain div");
+      let lastP = -1;
+      const clock = { t: 0 };
+      const hudWrite = () => {
+        const t = clock.t;
+        const p = Math.min(7, Math.floor(t / (2 * BAR)));
+        if (p !== lastP) {
+          hudPlate.textContent = `PLATE 0${p + 1} / 08 — ${PLATES[p]}`;
+          lastP = p;
+        }
+        // risk rolls down over the first beat of each plate
+        const k = Math.min(1, (t - PLATE(p + 1)) / BEAT);
+        const prev = p > 0 ? RISK[p - 1] : RISK[0];
+        const r = prev + (RISK[p] - prev) * (1 - Math.pow(1 - k, 3));
+        hudRisk.textContent = r.toFixed(2);
+        $("#risk-fill").style.transform = `scaleX(${r.toFixed(3)})`;
+        const f = Math.min(DURATION * 30 - 1, Math.round(t * 30));
+        hudTc.textContent = `00:${String(Math.floor(f / 30)).padStart(2, "0")}:${String(f % 30).padStart(2, "0")}`;
+        const g = Math.floor(t * 15);
+        grain.style.transform = `translate(${((hash(g * 3) * 2 - 1) * 12).toFixed(1)}%, ${((hash(g * 7) * 2 - 1) * 12).toFixed(1)}%)`;
+      };
+      hudWrite();
+
+      /* ═══ PLATE 01 — DEPARTURE (0 – 3.75) ═══ */
+      tl.fromTo(["#c-tl", "#c-tr", "#c-bl", "#c-br"], { scale: 1.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "expo.out", stagger: 0.04 }, 0);
+      tl.fromTo("#p1-grid", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power1.out" }, 0.1);
+      document.querySelectorAll("#p1-svg .draw").forEach((el, i) => draw(el, 0.15 + i * 0.08, 0.6));
+      tl.fromTo("#db-hatch", { opacity: 0 }, { opacity: 0.55, duration: 0.5, ease: "power1.out" }, bar(0, 2));
+      pop("#p1-app-l", bar(0, 2));
+      pop("#p1-db-l", bar(0, 2) + 0.1);
+      draw($("#p1-trail"), bar(0, 3), BAR * 0.75, "power2.inOut");
+      rideSpark($("#p1-spark"), $("#p1-trail"), bar(0, 3), BAR * 0.75);
+      pop("#p1-title", bar(1), { x: -60, opacity: 0, filter: "blur(12px)" }, 0.45);
+      pop("#p1-sub", bar(1, 1), { y: 20, opacity: 0 }, 0.4);
+
+      /* ═══ PLATE 02 — HANDSHAKE (3.75 – 7.5) ═══ */
+      const P2 = PLATE(2);
+      cut("#p1", "#p2", P2);
+      flash(P2, 0.5, 0.14);
+      document.querySelectorAll("#p2-svg .draw").forEach((el, i) => draw(el, P2 + i * 0.05, 0.4));
+      pop("#p2-title", P2, { y: 80, opacity: 0 }, 0.4);
+      ["#a0", "#a1", "#a2", "#a3"].forEach((id, i) => {
+        const at = P2 + (i + 1) * BEAT * 0.8;
+        draw($(id), at, BEAT * 0.7, "power2.inOut");
+        pop(`#t${i}`, at + 0.1, { y: 10, opacity: 0 }, 0.3);
+      });
+      draw($("#ecdh-l"), bar(3, 0.5), BEAT, "power2.inOut");
+      draw($("#ecdh-r"), bar(3, 0.5), BEAT, "power2.inOut");
+      rideSpark($("#p2-spark"), $("#ecdh-l"), bar(3, 0.5), BEAT);
+      pop("#t4", bar(3, 1.5));
+      ["#lock-shackle", "#lock-body", "#lock-hole"].forEach((id, i) => draw($(id), bar(3, 2) + i * 0.08, 0.35));
+      pop("#t5", bar(3, 2.3));
+      tl.to("#p2-spark", { opacity: 0, duration: 0.15 }, bar(3, 2));
+      // zoom through the keyhole into the wire
+      tl.to("#p2-zoom", { scale: 9, transformOrigin: "960px 905px", duration: BEAT * 0.9, ease: "power3.in" }, bar(3, 3) - 0.05);
+      tl.to("#p2-title", { opacity: 0, duration: 0.2 }, bar(3, 3));
+
+      /* ═══ PLATE 03 — IN TRANSIT (7.5 – 11.25) ═══ */
+      const P3 = PLATE(3);
+      cut("#p2", "#p3", P3);
+      flash(P3, 0.9, 0.3);
+      caBurst(P3, 0.3, 18);
+      typeOn($("#p3-plain"), crypto.plaintext, P3 + 0.1, BEAT * 1.6);
+      const ctHex = crypto.ciphertext_hex.match(/../g);
+      const cipherText = ctHex.slice(0, 29).join(" ") + "\n" + ctHex.slice(29).join(" ");
+      scrambleTo($("#p3-cipher"), cipherText, bar(4, 2), BEAT * 2.2);
+      tl.fromTo("#p3-tap", { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.35, ease: "expo.out" }, bar(5));
+      const tapEl = $("#p3-tapdump");
+      const tapSt = { k: 0 };
+      tl.to(
+        tapSt,
+        {
+          k: 1,
+          duration: BAR,
+          ease: "none",
+          onUpdate: () => {
+            const off = Math.floor(tapSt.k * 40);
+            const lines = [];
+            for (let r = 0; r < 4; r++) lines.push(Array.from({ length: 12 }, (_, c) => ctHex[(off + r * 12 + c) % ctHex.length]).join(" "));
+            tapEl.textContent = lines.join("\n");
+          },
+        },
+        bar(5),
+      );
+      pop("#p3-title", P3 + 0.2, { x: -60, opacity: 0, filter: "blur(10px)" }, 0.4);
+
+      /* ═══ PLATE 04 — INJECTION (11.25 – 15) ═══ */
+      const P4 = PLATE(4);
+      cut("#p3", "#p4", P4);
+      flash(P4, 1, 0.22);
+      typeOn($("#p4-input"), "' OR '1'='1' --", P4 + 0.05, BEAT * 1.5);
+      pop("#cardA", P4, { y: 40, opacity: 0 }, 0.35);
+      pop("#p4-a-res", bar(6, 2), { x: -20, opacity: 0 }, 0.3);
+      draw($("#strike"), bar(6, 3), 0.25, "power4.out");
+      pop("#cardB", bar(7), { x: 80, opacity: 0 }, 0.4);
+      pop("#p4-b-res", bar(7, 1.5), { x: -20, opacity: 0 }, 0.3);
+      tl.fromTo("#stamp", { scale: 2.6, rotation: -14, opacity: 0 }, { scale: 1, rotation: -8, opacity: 1, duration: 0.18, ease: "power4.in" }, bar(7, 2.4));
+      shake(bar(7, 2.4) + 0.18, 0.35, 18);
+      pop("#p4-title", P4 + 0.15, { y: 60, opacity: 0 }, 0.4);
+
+      /* ═══ PLATE 05 — HASHED (15 – 18.75) ═══ */
+      const P5 = PLATE(5);
+      cut("#p4", "#p5", P5);
+      caBurst(P5, 0.25, 16);
+      ["#h0", "#h1", "#h2", "#h3"].forEach((id, i) => pop(id, P5 + i * BEAT, { x: -30, opacity: 0 }, 0.3));
+      const cnt = { v: 0 };
+      tl.to(cnt, { v: 4096, duration: BAR * 0.95, ease: "power2.inOut", onUpdate: () => ($("#h-count").textContent = String(Math.round(cnt.v)).padStart(4, "0")) }, P5 + 3 * BEAT);
+      pop("#h-slab", bar(9, 2), { y: 30, opacity: 0, filter: "blur(10px)" }, 0.4);
+      pop("#h-cap", bar(9, 3), { y: 16, opacity: 0 }, 0.35);
+      pop("#p5-title", P5 + 0.1, { x: -60, opacity: 0, filter: "blur(10px)" }, 0.4);
+      // guilloché rosette: hypotrochoid family, spun and densified with the rounds counter
+      const gc = $("#guilloche").getContext("2d");
+      const rose = { t: 0 };
+      const drawRose = () => {
+        const t = rose.t;
+        gc.clearRect(0, 0, 900, 900);
+        gc.save();
+        gc.translate(450, 450);
+        gc.rotate(t * 0.9);
+        const families = 7;
+        for (let f = 0; f < families; f++) {
+          const R = 300 - f * 22,
+            r = 61 + f * 4,
+            d = 95 + f * 11 + Math.sin(t * 2 + f) * 6;
+          gc.beginPath();
+          const steps = 900;
+          const reveal = Math.min(1, cnt.v / 4096 + 0.15);
+          for (let i = 0; i <= steps * reveal; i++) {
+            const a = (i / steps) * Math.PI * 2 * r;
+            const x = (R - r) * Math.cos(a) + d * Math.cos(((R - r) / r) * a);
+            const y = (R - r) * Math.sin(a) - d * Math.sin(((R - r) / r) * a);
+            i ? gc.lineTo(x * 0.95, y * 0.95) : gc.moveTo(x * 0.95, y * 0.95);
+          }
+          gc.strokeStyle = f === 3 ? "rgba(255,77,18,0.8)" : "rgba(238,233,223,0.22)";
+          gc.lineWidth = f === 3 ? 1.6 : 1;
+          gc.stroke();
+        }
+        gc.restore();
+      };
+      tl.fromTo(rose, { t: 0 }, { t: 2 * BAR, duration: 2 * BAR, ease: "none", onUpdate: drawRose }, P5);
+
+      /* ═══ PLATE 06 — LEAST PRIVILEGE (18.75 – 22.5) ═══ */
+      const P6 = PLATE(6);
+      cut("#p5", "#p6", P6);
+      flash(P6, 0.6, 0.16);
+      pop("#p6-title", P6 + 0.1, { y: 60, opacity: 0 }, 0.4);
+
+      /* ═══ PLATE 07 — AT REST / AUDITED (22.5 – 26.25) ═══ */
+      const P7 = PLATE(7);
+      cut("#p6", "#p7", P7);
+      caBurst(P7, 0.25, 16);
+      const blocks = $("#blocks");
+      const ROWS = ["id 0042\nalice@\nexample.com", "id 0043\nbob@\nexample.com", "id 0044\ncarol@\nexample.org", "id 0045\ndave@\nexample.net"];
+      const blockEls = [];
+      for (let r = 0; r < 5; r++)
+        for (let c = 0; c < 7; c++) {
+          const b = document.createElement("div");
+          b.className = "block mono";
+          b.style.left = `${120 + c * 128}px`;
+          b.style.top = `${170 + r * 88}px`;
+          b.textContent = ROWS[(r * 7 + c) % 4];
+          blocks.appendChild(b);
+          blockEls.push({ el: b, i: r * 7 + c, r, c });
+        }
+      tl.fromTo(".block", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(1.6)", stagger: { each: 0.008, from: "start" } }, P7);
+      // encryption wave: each page flips to ciphertext as the wave passes
+      const wave = { w: 0 };
+      tl.to(
+        wave,
+        {
+          w: 1,
+          duration: BAR * 0.8,
+          ease: "power1.inOut",
+          onUpdate: () => {
+            blockEls.forEach(({ el, i, r, c }) => {
+              const enc = (c + r * 0.5) / 9 < wave.w;
+              if (enc && !el.dataset.enc) {
+                const h = ctHex.slice((i * 5) % 40, ((i * 5) % 40) + 9);
+                el.textContent = `${h.slice(0, 3).join(" ")}\n${h.slice(3, 6).join(" ")}\n${h.slice(6, 9).join(" ")}`;
+                el.style.color = "#ff4d12";
+                el.style.borderColor = "#ff4d12";
+                el.dataset.enc = "1";
+              } else if (!enc && el.dataset.enc) {
+                el.textContent = ROWS[i % 4];
+                el.style.color = "";
+                el.style.borderColor = "";
+                delete el.dataset.enc;
+              }
+            });
+          },
+        },
+        bar(12, 1),
+      );
+      draw($("#key-ring"), P7 + 0.1, 0.5);
+      tl.fromTo("#key", { scale: 0, rotation: -90 }, { scale: 1, rotation: 0, duration: 0.45, ease: "back.out(2)" }, P7 + 0.2);
+      pop("#key-label", P7 + 0.3);
+      // key rotation v1 → v2 on bar 13
+      tl.to("#key", { rotation: 360, duration: 0.6, ease: "power3.inOut" }, bar(13));
+      tl.set("#key-label", { textContent: "KMS · DEK v2" }, bar(13) + 0.3);
+      tl.fromTo("#key-pulse", { attr: { r: 120 }, opacity: 0.9 }, { attr: { r: 260 }, opacity: 0, duration: 0.6, ease: "power2.out" }, bar(13) + 0.3);
+      const LOG = [
+        "14:02:11Z  app_reader  SELECT  users      rows=1",
+        "14:02:11Z  app_reader  SELECT  payments   DENIED",
+        "14:02:12Z  app_writer  INSERT  orders     rows=1",
+        "14:02:12Z  app_reader  SELECT  orders     rows=3",
+        "14:02:13Z  kms         ROTATE  DEK v1→v2  ok",
+        "14:02:13Z  backup      SNAPSHOT encrypted  ok",
+      ];
+      const logEl = $("#log");
+      LOG.forEach((line, i) => {
+        const d = document.createElement("div");
+        d.className = "mono";
+        d.textContent = line;
+        if (line.includes("DENIED") || line.includes("ROTATE")) d.style.color = "#ff4d12";
+        logEl.appendChild(d);
+        tl.fromTo(d, { x: -16, opacity: 0 }, { x: 0, opacity: 1, duration: 0.2, ease: "power2.out" }, P7 + 0.3 + i * BEAT * 0.9);
+      });
+      pop("#p7-title", P7 + 0.1, { x: -60, opacity: 0, filter: "blur(10px)" }, 0.4);
+
+      /* ═══ PLATE 08 — HANDLED (26.25 – 30) ═══ */
+      const P8 = PLATE(8);
+      cut("#p7", "#p8", P8);
+      flash(P8, 1, 0.35);
+      draw($("#p8-line"), P8, BEAT * 1.2, "power3.inOut");
+      rideSpark($("#p8-spark"), $("#p8-line"), P8, BEAT * 1.2, "power3.inOut");
+      tl.to("#p8-line", { opacity: 0, duration: 0.2 }, bar(14, 2));
+      tl.fromTo("#w-data", { x: -120, opacity: 0, filter: "blur(16px)" }, { x: 0, opacity: 1, filter: "blur(0px)", duration: 0.32, ease: "power4.out" }, bar(14, 2));
+      tl.fromTo("#w-handled", { scale: 1.5, opacity: 0, filter: "blur(18px)", transformOrigin: "0% 50%" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.32, ease: "power4.out" }, bar(15));
+      shake(bar(15) + 0.05, 0.3, 12);
+      tl.to("#p8-spark", { x: 1690, y: 690, scale: 0.6, duration: 0.3, ease: "power2.out" }, bar(15));
+      pop("#w-sign", bar(15, 1.5));
+      pop("#w-cap", bar(15, 2));
+      tl.fromTo(["#e-tl", "#e-tr", "#e-bl", "#e-br"], { scale: 1.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "expo.out", stagger: 0.04 }, bar(15, 2.5));
+
+      /* ═══ 3D layer: engraved tunnel (plate 03) and engraved database (plate 06) ═══ */
+      const renderer = new THREE.WebGLRenderer({ canvas: $("#three"), antialias: true, alpha: true, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(1);
+      renderer.setSize(W, H, false);
+      renderer.setClearColor(0x000000, 0);
+      const camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 400);
+      const ENGRAVE = {
+        vertexShader: `varying vec3 vN; varying vec3 vV; varying float vDepth;
+          void main(){ vec4 mv = modelViewMatrix * vec4(position,1.0); vN = normalize(normalMatrix*normal); vV = -mv.xyz; vDepth = -mv.z; gl_Position = projectionMatrix*mv; }`,
+        fragmentShader: `uniform vec3 uLight; uniform float uAngle; uniform float uSpacing; uniform float uFog; uniform float uRim;
+          varying vec3 vN; varying vec3 vV; varying float vDepth;
+          void main(){
+            vec3 n = normalize(vN); if(!gl_FrontFacing) n = -n;
+            float lum = clamp(dot(n, normalize(uLight)) * 0.75 + 0.3, 0.0, 1.0);
+            float c = gl_FragCoord.x*cos(uAngle) + gl_FragCoord.y*sin(uAngle);
+            float d = abs(fract(c/uSpacing) - 0.5) * uSpacing;            // px to nearest hatch line
+            float w = lum * uSpacing * 0.42;                                   // brighter = thicker bone line
+            float line = 1.0 - smoothstep(w - 0.8, w + 0.8, d);
+            float c2 = gl_FragCoord.x*cos(uAngle+1.4) + gl_FragCoord.y*sin(uAngle+1.4);
+            float d2 = abs(fract(c2/(uSpacing*1.3)) - 0.5) * uSpacing*1.3;
+            line = max(line, (1.0 - smoothstep(0.5, 1.4, d2)) * step(0.72, lum) * 0.6);
+            float rim = pow(1.0 - abs(dot(n, normalize(vV))), 3.0) * uRim;
+            vec3 ink = vec3(0.039,0.039,0.043), bone = vec3(0.933,0.914,0.875), sig = vec3(1.0,0.302,0.071);
+            vec3 col = mix(ink, bone, line*0.85) + sig*rim;
+            float fog = exp(-vDepth * uFog);
+            gl_FragColor = vec4(mix(ink, col, fog), 1.0);
+          }`,
+      };
+      const engraveMat = (opts = {}) =>
+        new THREE.ShaderMaterial({
+          ...ENGRAVE,
+          side: THREE.DoubleSide,
+          uniforms: {
+            uLight: { value: new THREE.Vector3(...(opts.light || [0.4, 0.8, 0.6])) },
+            uAngle: { value: opts.angle ?? 0.7 },
+            uSpacing: { value: opts.spacing ?? 7.0 },
+            uFog: { value: opts.fog ?? 0.0 },
+            uRim: { value: opts.rim ?? 0.9 },
+          },
+        });
+      // tunnel
+      const tunnelScene = new THREE.Scene();
+      const tube = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 260, 48, 60, true), engraveMat({ light: [0, 1, 0.3], spacing: 6, fog: 0.022, rim: 0.0 }));
+      tube.rotation.x = Math.PI / 2;
+      tube.position.z = -120;
+      tunnelScene.add(tube);
+      const ribs = [];
+      for (let i = 0; i < 40; i++) {
+        const rib = new THREE.Mesh(new THREE.TorusGeometry(3.85, 0.06, 6, 64), new THREE.MeshBasicMaterial({ color: i % 5 === 0 ? 0xff4d12 : 0x5e5b57 }));
+        rib.position.z = -i * 6;
+        tunnelScene.add(rib);
+        ribs.push(rib);
+      }
+      const packets = [];
+      for (let i = 0; i < 26; i++) {
+        const m = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 1.4), new THREE.MeshBasicMaterial({ color: i % 3 ? 0xff4d12 : 0xff8a3d }));
+        const a = hash(i * 3) * Math.PI * 2,
+          rr = 1.2 + hash(i * 5) * 1.8;
+        m.userData = { x: Math.cos(a) * rr, y: Math.sin(a) * rr, z0: -hash(i * 7) * 200, v: 55 + hash(i * 11) * 25 };
+        tunnelScene.add(m);
+        packets.push(m);
+      }
+      // database: three table discs, exploded
+      const dbScene = new THREE.Scene();
+      const discs = [0, 1, 2].map((i) => {
+        const g = new THREE.Group();
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(2.3, 2.3, 0.7, 96), engraveMat({ spacing: 6.5, rim: 1.1, light: [0.5, 0.9, 0.4] }));
+        g.add(body);
+        const edge = new THREE.Mesh(new THREE.TorusGeometry(2.3, 0.025, 6, 128), new THREE.MeshBasicMaterial({ color: 0xeee9df }));
+        edge.rotation.x = Math.PI / 2;
+        edge.position.y = 0.35;
+        g.add(edge);
+        dbScene.add(g);
+        return { g, body };
+      });
+      const DB_CAM = new THREE.Vector3(2.0, 4.6, 15.5);
+      const DB_LOOK = new THREE.Vector3(-0.7, -0.2, 0);
+      const discY = (i, ex) => (1 - i) * (0.85 + 1.25 * ex);
+      const labelEls = [0, 1, 2].map((i) => $(`#tl-${i}`));
+      const project = (v) => {
+        camera.updateMatrixWorld();
+        const p = v.clone().project(camera);
+        return { x: (p.x * 0.5 + 0.5) * W, y: (-p.y * 0.5 + 0.5) * H };
+      };
+      let cleared = false;
+      function render3D(t) {
+        const inTunnel = t >= PLATE(3) && t < PLATE(4);
+        const inDB = t >= PLATE(6) && t < PLATE(7);
+        if (!inTunnel && !inDB) {
+          if (!cleared) {
+            renderer.clear();
+            cleared = true;
+          }
+          return;
+        }
+        cleared = false;
+        if (inTunnel) {
+          const lt = t - PLATE(3);
+          const z = -lt * 34;
+          camera.fov = 62;
+          camera.aspect = W / H;
+          camera.updateProjectionMatrix();
+          camera.position.set(Math.sin(lt * 1.3) * 0.5, Math.cos(lt * 1.1) * 0.35, z);
+          camera.lookAt(0, 0, z - 10);
+          camera.rotateZ(lt * 0.18);
+          ribs.forEach((r, i) => (r.position.z = z - (((i * 6 - lt * 0) % 240) + 240) % 240));
+          packets.forEach((m) => {
+            const u = m.userData;
+            m.position.set(u.x, u.y, z - 4 - ((((-u.z0 + lt * (u.v - 34)) % 200) + 200) % 200));
+          });
+          tube.position.z = z - 120;
+          renderer.render(tunnelScene, camera);
+        } else {
+          const lt = t - PLATE(6);
+          const ex = Math.min(1, Math.max(0, lt / (BEAT * 1.5)));
+          const exE = 1 - Math.pow(1 - ex, 3);
+          camera.fov = 38;
+          camera.aspect = W / H;
+          camera.updateProjectionMatrix();
+          camera.position.copy(DB_CAM);
+          camera.lookAt(DB_LOOK);
+          discs.forEach((d, i) => {
+            d.g.position.set(2.6, discY(i, exE), 0);
+            d.g.rotation.y = lt * 0.4 + i * 0.3;
+          });
+          const deniedK = Math.max(0, Math.min(1, (lt - bar(1, 2)) / 0.15));
+          discs[2].body.material.uniforms.uRim.value = 1.1 + deniedK * 3.0 * (0.6 + 0.4 * Math.sin(lt * 30));
+          renderer.render(dbScene, camera);
+          // labels follow the discs' right edges
+          discs.forEach((d, i) => {
+            const p = project(new THREE.Vector3(2.6 + 2.5, discY(i, exE), 0));
+            labelEls[i].style.transform = `translate(${(p.x + 30).toFixed(1)}px, ${(p.y - 18).toFixed(1)}px)`;
+          });
+        }
+      }
+      // plate 06 overlays: beams from the role card to the table labels (final, exploded positions)
+      camera.fov = 38;
+      camera.aspect = W / H;
+      camera.updateProjectionMatrix();
+      camera.position.copy(DB_CAM);
+      camera.lookAt(DB_LOOK);
+      const svg6 = $("#p6-svg");
+      const NS = "http://www.w3.org/2000/svg";
+      [0, 1, 2].forEach((i) => {
+        const end = project(new THREE.Vector3(2.6 + 2.5, discY(i, 1), 0));
+        const path = document.createElementNS(NS, "path");
+        path.setAttribute("d", `M 720 330 C 900 330, ${end.x - 220} ${end.y}, ${end.x + 20} ${end.y}`);
+        path.setAttribute("class", i === 2 ? "ln-sig" : "ln");
+        if (i === 2) path.setAttribute("stroke-dasharray", "10 8");
+        svg6.appendChild(path);
+        const at = PLATE(6) + BEAT * 1.6 + i * BEAT * 0.7;
+        if (i < 2) draw(path, at, BEAT * 0.6, "power2.inOut");
+        else {
+          tl.fromTo(path, { opacity: 0 }, { opacity: 1, duration: 0.2 }, at);
+        }
+        tl.fromTo(`#ok-${i}`, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, at + BEAT * 0.5);
+      });
+      tl.fromTo(labelEls, { opacity: 0 }, { opacity: 1, duration: 0.3, stagger: 0.08 }, PLATE(6) + BEAT);
+      tl.fromTo("#p6-err", { x: -30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.25, ease: "power3.out" }, bar(11, 2));
+      caBurst(bar(11, 2), 0.25, 12);
+
+      /* ── master clock: HUD + 3D ── */
+      tl.fromTo(
+        clock,
+        { t: 0 },
+        {
+          t: DURATION,
+          duration: DURATION,
+          ease: "none",
+          onUpdate: () => {
+            hudWrite();
+            render3D(clock.t);
+          },
+        },
+        0,
+      );
+      render3D(0);
+      window.__timelines["main"] = tl;
+      window.__built();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+{
+ "bcrypt": "$2b$12$D7WwBTXwBwUodIn1xuUOPuxDO8YsGORzLha2mqyCoKLwkhBaD7o5O",
+ "bcrypt_salt": "D7WwBTXwBwUodIn1xuUOPu",
+ "aes_key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+ "nonce_hex": "cafebabefacedbaddecaf888",
+ "plaintext": "SELECT id, email FROM users WHERE id = 42;",
+ "ciphertext_hex": "d9e6ec63e92e6f7222277db8167ce0532d66921e92391f072bad7751e9c120ade870a822e1e969561460e0278d3ca2e1d3355f22a50e83f4419a"
+}

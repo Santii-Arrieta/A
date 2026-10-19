@@ -1,0 +1,254 @@
+{
+ "bpm": 128,
+ "bar": 1.875,
+ "events": [
+  {
+   "sfx": "impact-bass-1",
+   "t": -0.05
+  },
+  {
+   "sfx": "key-press",
+   "t": 0.15
+  },
+  {
+   "sfx": "key-press",
+   "t": 0.23
+  },
+  {
+   "sfx": "key-press",
+   "t": 0.31
+  },
+  {
+   "sfx": "key-press",
+   "t": 0.39
+  },
+  {
+   "sfx": "key-press",
+   "t": 0.47
+  },
+  {
+   "sfx": "key-press",
+   "t": 0.55
+  },
+  {
+   "sfx": "key-press",
+   "t": 0.63
+  },
+  {
+   "sfx": "key-press",
+   "t": 0.71
+  },
+  {
+   "sfx": "whoosh-short",
+   "t": 1.245
+  },
+  {
+   "sfx": "impact-bass-1",
+   "t": 1.825
+  },
+  {
+   "sfx": "impact-bass-1",
+   "t": 3.7
+  },
+  {
+   "sfx": "click-soft",
+   "t": 4.125
+  },
+  {
+   "sfx": "click-soft",
+   "t": 4.5
+  },
+  {
+   "sfx": "click-soft",
+   "t": 4.875
+  },
+  {
+   "sfx": "click-soft",
+   "t": 5.25
+  },
+  {
+   "sfx": "whoosh",
+   "t": 5.698
+  },
+  {
+   "sfx": "ping",
+   "t": 6.562
+  },
+  {
+   "sfx": "riser(tail)",
+   "t": 6.6
+  },
+  {
+   "sfx": "riser(tail)",
+   "t": 24.65
+  },
+  {
+   "sfx": "impact-bass-2",
+   "t": 7.477
+  },
+  {
+   "sfx": "glitch-3",
+   "t": 7.5
+  },
+  {
+   "sfx": "typing",
+   "t": 7.6
+  },
+  {
+   "sfx": "glitch-2",
+   "t": 8.438
+  },
+  {
+   "sfx": "whoosh-short",
+   "t": 9.214
+  },
+  {
+   "sfx": "impact-bass-1",
+   "t": 11.2
+  },
+  {
+   "sfx": "typing",
+   "t": 11.3
+  },
+  {
+   "sfx": "error",
+   "t": 12.188
+  },
+  {
+   "sfx": "whoosh-short",
+   "t": 12.495
+  },
+  {
+   "sfx": "whoosh",
+   "t": 12.964
+  },
+  {
+   "sfx": "impact-bass-2",
+   "t": 14.407
+  },
+  {
+   "sfx": "glitch-1",
+   "t": 15.0
+  },
+  {
+   "sfx": "click-soft",
+   "t": 15.0
+  },
+  {
+   "sfx": "click-soft",
+   "t": 15.469
+  },
+  {
+   "sfx": "click-soft",
+   "t": 15.938
+  },
+  {
+   "sfx": "click-soft",
+   "t": 16.406
+  },
+  {
+   "sfx": "rounds-counter(synth)",
+   "t": 16.406
+  },
+  {
+   "sfx": "impact-bass-1",
+   "t": 17.762
+  },
+  {
+   "sfx": "impact-bass-1",
+   "t": 18.7
+  },
+  {
+   "sfx": "whoosh-short",
+   "t": 19.339
+  },
+  {
+   "sfx": "pop",
+   "t": 19.734
+  },
+  {
+   "sfx": "whoosh-short",
+   "t": 19.667
+  },
+  {
+   "sfx": "pop",
+   "t": 20.062
+  },
+  {
+   "sfx": "whoosh-short",
+   "t": 19.995
+  },
+  {
+   "sfx": "pop",
+   "t": 20.391
+  },
+  {
+   "sfx": "error",
+   "t": 21.562
+  },
+  {
+   "sfx": "glitch-2",
+   "t": 21.562
+  },
+  {
+   "sfx": "glitch-1",
+   "t": 22.5
+  },
+  {
+   "sfx": "sparkle",
+   "t": 22.969
+  },
+  {
+   "sfx": "whoosh",
+   "t": 24.214
+  },
+  {
+   "sfx": "ping",
+   "t": 24.675
+  },
+  {
+   "sfx": "key-press",
+   "t": 22.8
+  },
+  {
+   "sfx": "key-press",
+   "t": 23.222
+  },
+  {
+   "sfx": "key-press",
+   "t": 23.644
+  },
+  {
+   "sfx": "key-press",
+   "t": 24.066
+  },
+  {
+   "sfx": "key-press",
+   "t": 24.488
+  },
+  {
+   "sfx": "key-press",
+   "t": 24.909
+  },
+  {
+   "sfx": "impact-bass-2",
+   "t": 26.227
+  },
+  {
+   "sfx": "whoosh-short",
+   "t": 26.089
+  },
+  {
+   "sfx": "impact-bass-1",
+   "t": 27.137
+  },
+  {
+   "sfx": "impact-bass-2",
+   "t": 28.102
+  },
+  {
+   "sfx": "chime",
+   "t": 29.297
+  }
+ ]
+}
