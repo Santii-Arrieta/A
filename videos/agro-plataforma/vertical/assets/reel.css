@@ -684,9 +684,8 @@ body {
   background: #d3b73b;
 }
 #logo-cai {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
+  height: 128px;
+  width: auto;
 }
 #s7-qr {
   display: flex;
@@ -727,4 +726,14 @@ body {
 .dash-head .logo-img {
   height: 40px;
   width: auto;
+}
+
+/* celular: píldoras más chicas y filas con aire para que no se toquen */
+.phone .row {
+  line-height: 1.8;
+}
+.phone .pill {
+  font-size: 18px;
+  line-height: 1.45;
+  padding: 1px 12px;
 }

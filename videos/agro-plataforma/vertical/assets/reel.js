@@ -362,12 +362,11 @@
     tl.to(sel, { strokeDashoffset: 0, duration: d, ease: "power2.inOut", stagger }, t);
   }
   // k0 · historial: se dibuja el reloj, la flecha de "volver atrás" y las agujas giran hacia atrás
-  draw("#k0-face", 46.6, 0.8);
-  draw("#k0-arrow", 47.1, 0.45);
+  draw("#k0-face", 46.6, 0.9);
+  draw("#k0-arrow", 47.4, 0.35);
   tl.fromTo(["#k0-min", "#k0-hr"], { opacity: 0 }, { opacity: 1, duration: 0.3, ease: IN }, 47.0);
   tl.fromTo("#k0-min", { rotation: 0 }, { rotation: -360, svgOrigin: "60 60", duration: 1.4, ease: "power2.inOut" }, 47.2);
   tl.fromTo("#k0-hr", { rotation: 0 }, { rotation: -30, svgOrigin: "60 60", duration: 1.4, ease: "power2.inOut" }, 47.2);
-  tl.to("#k0-min", { rotation: -450, svgOrigin: "60 60", duration: 5.0, ease: "none" }, 48.6);
   // k1 · informes: la hoja se dibuja y las líneas se escriben
   draw("#k1-doc", 46.7, 0.8);
   draw(".k1-line", 47.3, 0.4, 0.25);

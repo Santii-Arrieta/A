@@ -301,7 +301,7 @@ g = np.convolve(g, np.ones(2400) / 2400, mode="same")
 mix *= g
 
 mix = np.tanh(mix * 1.1) / np.tanh(1.1)
-mix *= 10 ** (-1.0 / 20) / np.max(np.abs(mix))
+mix *= 10 ** (-5.0 / 20) / np.max(np.abs(mix))  # pico -5 dBFS: música de fondo, 4 dB más baja que la v1
 mix[:, -int(0.05 * SR) :] *= np.linspace(1, 0, int(0.05 * SR))
 
 OUT.parent.mkdir(parents=True, exist_ok=True)
@@ -312,4 +312,4 @@ with wave.open(str(OUT), "wb") as wf:
     wf.setframerate(SR)
     wf.writeframes(pcm.tobytes())
 rms = 20 * np.log10(np.sqrt(np.mean(mix**2)))
-print(f"{OUT} {N / SR:.2f}s  pico -1.0 dBFS  RMS {rms:.1f} dBFS")
+print(f"{OUT} {N / SR:.2f}s  pico -5.0 dBFS  RMS {rms:.1f} dBFS")
