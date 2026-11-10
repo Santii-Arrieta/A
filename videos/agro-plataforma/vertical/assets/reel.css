@@ -1,0 +1,660 @@
+/* Estilos compartidos por index.html (16:9) y vertical.html (9:16).
+   El formato lo decide la clase del #root: .land (1920×1080) o .port (1080×1920). */
+@font-face {
+  font-family: "Montserrat";
+  font-weight: 700;
+  src: url("fonts/montserrat-latin-700-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Montserrat";
+  font-weight: 900;
+  src: url("fonts/montserrat-latin-900-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Playfair Display";
+  font-style: italic;
+  font-weight: 700;
+  src: url("fonts/playfair-display-latin-700-italic.woff2") format("woff2");
+}
+:root {
+  --bg: #0b0b0b;
+  --panel: #161614;
+  --gold: #ffc600;
+  --gold2: #d3b73b;
+  --text: #f4f1e8;
+  --text2: #c9c4b6;
+  --green: #7db35a;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html,
+body {
+  overflow: hidden;
+  background: #0b0b0b;
+}
+#root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0b0b0b;
+  color: #f4f1e8;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+}
+.layer {
+  position: absolute;
+  inset: 0;
+}
+.scene {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.abs {
+  position: absolute;
+}
+.title {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 1.02;
+}
+.accent {
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  font-weight: 700;
+  color: #ffc600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.gold {
+  color: #ffc600;
+}
+.muted {
+  color: #c9c4b6;
+}
+.word {
+  display: inline-block;
+}
+
+/* ── fondo: surcos + ondas doradas ── */
+#furrows path {
+  fill: none;
+  stroke: #1f1f1b;
+  stroke-width: 2;
+}
+#waves path {
+  fill: none;
+  stroke-linecap: round;
+}
+#field-glow {
+  background: radial-gradient(ellipse at 50% 100%, rgba(125, 179, 90, 0.1) 0%, rgba(125, 179, 90, 0) 60%);
+}
+
+/* ── escena 1 ── */
+#s1-rule {
+  height: 6px;
+  background: #ffc600;
+  transform-origin: left center;
+}
+
+/* ── caos: elementos sueltos ── */
+#chaos {
+  opacity: 0;
+}
+.item {
+  position: absolute;
+}
+.chat {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 26px 34px;
+  border-radius: 36px 36px 36px 8px;
+  background: #1e3a17;
+  border: 2px solid #7db35a;
+  font-size: 48px;
+  font-weight: 700;
+  color: #f4f1e8;
+  white-space: nowrap;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+.chat .ico {
+  flex: none;
+  width: 58px;
+  height: 58px;
+}
+.paper {
+  width: 300px;
+  height: 390px;
+  background: #f4f1e8;
+  border-radius: 6px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+.sheet {
+  width: 520px;
+  height: 340px;
+  background: #161614;
+  border: 2px solid #3a3a33;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+.folder {
+  width: 340px;
+  height: 260px;
+}
+.mapbox {
+  width: 460px;
+  height: 340px;
+  background: #121410;
+  border: 2px solid #3a3a33;
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+.tractor {
+  width: 360px;
+  height: 220px;
+}
+#arrows path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke: #c9c4b6;
+  stroke-width: 4;
+  stroke-dasharray: 14 12;
+}
+#counter {
+  background: rgba(22, 22, 20, 0.94);
+  border: 2px solid #3a3a33;
+  border-radius: 18px;
+  padding: 28px 40px;
+  font-size: 54px;
+  line-height: 1.35;
+  z-index: 5;
+}
+#counter div {
+  opacity: 0;
+}
+#counter b {
+  color: #ffc600;
+  font-weight: 900;
+}
+#freeze-dim {
+  background: #0b0b0b;
+  opacity: 0;
+}
+
+/* ── panel de la plataforma (escena 4) ── */
+#dash {
+  background: #161614;
+  border: 3px solid #ffc600;
+  border-radius: 24px;
+  box-shadow: 0 0 60px rgba(255, 198, 0, 0.18);
+  opacity: 0;
+  overflow: hidden;
+}
+.dash-head {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 84px;
+  padding: 0 32px;
+  border-bottom: 2px solid #2b2b26;
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+.logo {
+  width: 46px;
+  height: 46px;
+}
+.dash-grid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 84px;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 22px;
+  padding: 26px;
+}
+.widget {
+  position: relative;
+  background: #1c1c19;
+  border: 2px solid #2b2b26;
+  border-radius: 16px;
+  padding: 20px 24px;
+  opacity: 0;
+  overflow: hidden;
+}
+.w-title {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #c9c4b6;
+  margin-bottom: 12px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 30px;
+  line-height: 1.55;
+  white-space: nowrap;
+}
+.dot {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #7db35a;
+}
+.pill {
+  margin-left: auto;
+  padding: 2px 16px;
+  border-radius: 99px;
+  font-size: 24px;
+  font-weight: 900;
+  color: #0b0b0b;
+  background: #7db35a;
+}
+.pill.gold {
+  background: #ffc600;
+}
+.doc-line {
+  height: 12px;
+  border-radius: 6px;
+  background: #3a3a33;
+  margin: 12px 0;
+}
+
+/* ── dos accesos (escena 5) ── */
+.laptop-screen {
+  background: #161614;
+  border: 14px solid #262622;
+  border-radius: 22px;
+  overflow: hidden;
+}
+.laptop-base {
+  height: 26px;
+  background: #2f2f2a;
+  border-radius: 0 0 26px 26px;
+}
+.phone {
+  background: #161614;
+  border: 14px solid #262622;
+  border-radius: 54px;
+  overflow: hidden;
+}
+.screen-pad {
+  padding: 26px 30px;
+}
+.label {
+  font-size: 56px;
+  font-weight: 900;
+  text-align: center;
+  line-height: 1.15;
+}
+
+/* ── beneficios (escena 6) ── */
+.card {
+  background: #161614;
+  border: 2px solid #3a3a33;
+  border-top: 6px solid #ffc600;
+  border-radius: 20px;
+  padding: 40px 36px;
+  opacity: 0;
+}
+.card svg {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 30px;
+}
+.card .ctext {
+  font-size: 50px;
+  font-weight: 900;
+  line-height: 1.12;
+}
+.card path,
+.card circle,
+.card rect,
+.card line {
+  fill: none;
+  stroke: #ffc600;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ── cierre (escena 7) ── */
+#cta-btn {
+  display: inline-block;
+  background: #ffc600;
+  color: #0b0b0b;
+  font-weight: 900;
+  text-transform: uppercase;
+  border-radius: 99px;
+  box-shadow: 0 0 50px rgba(255, 198, 0, 0.35);
+}
+
+/* transición: barrido con onda dorada */
+#wipe {
+  opacity: 0;
+  pointer-events: none;
+}
+#wipe-mover {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+#wipe-mover svg {
+  width: 100%;
+  height: 100%;
+}
+#wipe .wfill {
+  fill: #161614;
+}
+#wipe .wedge {
+  fill: none;
+  stroke: #ffc600;
+  stroke-width: 6;
+}
+
+/* ═════════ 16:9 ═════════ */
+.land #s1-box {
+  left: 160px;
+  top: 360px;
+}
+.land #s1-rule {
+  width: 220px;
+  margin-bottom: 40px;
+}
+.land #s1-title {
+  font-size: 118px;
+}
+.land #s3-box {
+  left: 0;
+  right: 0;
+  top: 380px;
+  text-align: center;
+}
+.land #s3-title {
+  font-size: 92px;
+}
+.land #s3-title .accent {
+  font-size: 128px;
+}
+.land #counter {
+  left: 100px;
+  top: 790px;
+}
+.land #dash {
+  left: 300px;
+  top: 270px;
+  width: 1320px;
+  height: 740px;
+}
+.land #s4-text {
+  left: 0;
+  right: 0;
+  top: 70px;
+  text-align: center;
+  font-size: 72px;
+}
+.land #laptop {
+  left: 150px;
+  top: 170px;
+  width: 860px;
+}
+.land #laptop .laptop-screen {
+  height: 540px;
+}
+.land #phone {
+  left: 1300px;
+  top: 110px;
+  width: 360px;
+  height: 680px;
+}
+.land #lab-a {
+  left: 120px;
+  top: 820px;
+  width: 920px;
+}
+.land #lab-b {
+  left: 1100px;
+  top: 820px;
+  width: 760px;
+}
+.land .card {
+  top: 300px;
+  width: 400px;
+  height: 450px;
+}
+.land #k0 {
+  left: 120px;
+}
+.land #k1 {
+  left: 560px;
+}
+.land #k2 {
+  left: 1000px;
+}
+.land #k3 {
+  left: 1440px;
+}
+.land #s7-box {
+  left: 0;
+  right: 0;
+  top: 200px;
+  text-align: center;
+}
+.land #s7-title {
+  font-size: 110px;
+}
+.land #s7-sub {
+  font-size: 60px;
+  margin-top: 24px;
+}
+.land #cta-btn {
+  margin-top: 70px;
+  padding: 34px 80px;
+  font-size: 58px;
+}
+.land #s7-url {
+  font-size: 52px;
+  margin-top: 40px;
+}
+
+/* ═════════ 9:16 ═════════ */
+.port #s1-box {
+  left: 80px;
+  top: 700px;
+  right: 80px;
+}
+.port #s1-rule {
+  width: 200px;
+  margin-bottom: 40px;
+}
+.port #s1-title {
+  font-size: 104px;
+}
+.port #s3-box {
+  left: 60px;
+  right: 60px;
+  top: 720px;
+  text-align: center;
+}
+.port #s3-title {
+  font-size: 84px;
+}
+.port #s3-title .accent {
+  font-size: 120px;
+}
+.port #counter {
+  left: 60px;
+  right: 60px;
+  top: 1560px;
+}
+.port #dash {
+  left: 50px;
+  top: 600px;
+  width: 980px;
+  height: 940px;
+}
+.port #s4-text {
+  left: 60px;
+  right: 60px;
+  top: 230px;
+  text-align: center;
+  font-size: 72px;
+}
+.port #laptop {
+  left: 70px;
+  top: 170px;
+  width: 940px;
+}
+.port #laptop .laptop-screen {
+  height: 560px;
+}
+.port #phone {
+  left: 330px;
+  top: 1010px;
+  width: 420px;
+  height: 560px;
+}
+.port #lab-a {
+  left: 60px;
+  right: 60px;
+  top: 800px;
+}
+.port #lab-b {
+  left: 60px;
+  right: 60px;
+  top: 1680px;
+}
+.port .card {
+  width: 470px;
+  height: 480px;
+}
+.port #k0 {
+  left: 50px;
+  top: 310px;
+}
+.port #k1 {
+  left: 560px;
+  top: 310px;
+}
+.port #k2 {
+  left: 50px;
+  top: 830px;
+}
+.port #k3 {
+  left: 560px;
+  top: 830px;
+}
+.port #s7-box {
+  left: 60px;
+  right: 60px;
+  top: 560px;
+  text-align: center;
+}
+.port #s7-title {
+  font-size: 86px;
+}
+.port #s7-sub {
+  font-size: 60px;
+  margin-top: 30px;
+}
+.port #cta-btn {
+  margin-top: 90px;
+  padding: 34px 60px;
+  font-size: 54px;
+}
+.port #s7-url {
+  font-size: 50px;
+  margin-top: 46px;
+}
+
+/* ── detalles de mockups ── */
+.arrow-head {
+  stroke-dasharray: none !important;
+}
+.lot-label {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 900;
+  font-size: 30px;
+  fill: #0b0b0b;
+}
+.ink path {
+  fill: none;
+  stroke: #3a3a33;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.folder-label {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 900;
+  font-size: 34px;
+  fill: #0b0b0b;
+  letter-spacing: 2px;
+}
+.w-body {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 66px;
+  bottom: 18px;
+}
+.w-body svg {
+  width: 100%;
+  height: 100%;
+}
+.inf-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 28px;
+  font-weight: 900;
+}
+.inf-sub {
+  font-size: 24px;
+  color: #c9c4b6;
+  margin-top: 6px;
+}
+.screen-cols {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 22px;
+  padding: 24px 26px;
+}
+.phone .row {
+  font-size: 26px;
+  line-height: 1.6;
+}
+.phone .w-title {
+  font-size: 22px;
+  margin-top: 14px;
+  margin-bottom: 4px;
+}
+.phone-field {
+  font-size: 32px;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+.hl {
+  border-radius: 10px;
+  padding: 0 10px;
+}
+.port .card {
+  padding: 40px 34px;
+}
+.land .pbr {
+  display: none;
+}

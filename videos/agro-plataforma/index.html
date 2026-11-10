@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Agro plataforma · 16:9</title>
+    <!--
+      TEXTOS EDITABLES: todo lo que se lee en pantalla está en este archivo.
+      Regla del brief: máximo 8 palabras por frase.
+      La versión 9:16 (vertical/index.html) se genera desde este archivo con
+      scripts/make-vertical.sh (no la edites a mano: editá acá y corré el script).
+    -->
+    <link rel="stylesheet" href="assets/reel.css" />
+    <style>
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+      }
+    </style>
+    <script src="vendor/gsap.min.js"></script>
+  </head>
+  <body>
+    <div
+      id="root"
+      class="land"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="60"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- Fondo: surcos + ondas doradas (dibujados por assets/reel.js) -->
+      <div id="bg" class="layer clip" data-start="0" data-duration="60" data-track-index="0" data-layout-ignore>
+        <div id="field-glow" class="layer"></div>
+        <svg id="furrows" class="layer"></svg>
+        <svg id="waves" class="layer"></svg>
+      </div>
+
+      <!-- ESCENA 1 · 0–6 s · gancho -->
+      <section id="s1" class="scene clip" data-start="0" data-duration="6.3" data-track-index="1">
+        <div id="s1-box" class="abs">
+          <div id="s1-rule"></div>
+          <h1 id="s1-title" class="title" data-hold>
+            <span class="word">Así</span> <span class="word">trabaja</span> <span class="word">hoy</span>
+            <span class="word">una</span> <span class="word">consultora</span> <span class="word gold">agro</span>
+          </h1>
+        </div>
+      </section>
+
+      <!-- ESCENA 2 · 6–16 s · caos (los elementos siguen vivos hasta la escena 4) -->
+      <section id="chaos" class="layer clip" data-start="5.9" data-duration="28.4" data-track-index="2" data-layout-allow-overlap>
+        <div id="chaos-shake" class="layer">
+          <svg id="arrows" class="layer"></svg>
+
+          <div id="i-paper1" class="item paper">
+            <svg class="ink" viewBox="0 0 300 390">
+              <path d="M34 60 q20 -8 40 0 t40 0 t40 0 t40 0 t40 0" />
+              <path d="M34 110 q18 -7 36 0 t36 0 t36 0 t36 0" />
+              <path d="M34 160 q20 -8 40 0 t40 0 t40 0 t40 0 t40 0" />
+              <path d="M34 210 q18 -7 36 0 t36 0 t36 0" />
+              <path d="M40 270 l60 -20 l70 30 l50 -40 l30 60 l-80 40 l-110 -20 z" />
+            </svg>
+          </div>
+
+          <div id="i-sheet" class="item sheet">
+            <svg viewBox="0 0 520 340">
+              <rect x="0" y="0" width="520" height="56" fill="#2b2b26" />
+              <g stroke="#3a3a33" stroke-width="2">
+                <line x1="0" y1="112" x2="520" y2="112" /><line x1="0" y1="168" x2="520" y2="168" />
+                <line x1="0" y1="224" x2="520" y2="224" /><line x1="0" y1="280" x2="520" y2="280" />
+                <line x1="150" y1="0" x2="150" y2="340" /><line x1="270" y1="0" x2="270" y2="340" />
+                <line x1="390" y1="0" x2="390" y2="340" />
+              </g>
+              <g fill="#7db35a"><rect x="20" y="76" width="100" height="14" rx="7" /><rect x="20" y="132" width="80" height="14" rx="7" /><rect x="20" y="188" width="110" height="14" rx="7" /><rect x="20" y="244" width="70" height="14" rx="7" /></g>
+              <g fill="#c9c4b6"><rect x="170" y="76" width="70" height="14" rx="7" /><rect x="290" y="132" width="60" height="14" rx="7" /><rect x="410" y="188" width="80" height="14" rx="7" /><rect x="170" y="244" width="50" height="14" rx="7" /><rect x="410" y="76" width="60" height="14" rx="7" /><rect x="290" y="300" width="70" height="14" rx="7" /></g>
+              <g fill="#ffc600"><rect x="20" y="22" width="90" height="14" rx="7" /><rect x="170" y="22" width="70" height="14" rx="7" /><rect x="290" y="22" width="70" height="14" rx="7" /><rect x="410" y="22" width="70" height="14" rx="7" /></g>
+            </svg>
+          </div>
+
+          <div id="i-chat1" class="item chat">
+            <svg class="ico" viewBox="0 0 58 58"><circle cx="29" cy="29" r="26" fill="none" stroke="#7db35a" stroke-width="3" /><circle cx="29" cy="23" r="8" fill="#7db35a" /><path d="M14 46 q15 -16 30 0" fill="none" stroke="#7db35a" stroke-width="4" /></svg>
+            <span>Lote 3, roya, 20%</span>
+          </div>
+
+          <div id="i-map" class="item mapbox" data-layout-ignore>
+            <svg viewBox="0 0 460 340">
+              <g stroke="#0b0b0b" stroke-width="4">
+                <path d="M30 40 L210 30 L230 170 L40 190 Z" fill="#7db35a" />
+                <path d="M210 30 L430 50 L420 150 L230 170 Z" fill="#d3b73b" />
+                <path d="M40 190 L230 170 L250 310 L50 300 Z" fill="#4f7a39" />
+                <path d="M230 170 L420 150 L430 300 L250 310 Z" fill="#7db35a" />
+              </g>
+              <text class="lot-label" x="95" y="120">1A</text>
+              <text class="lot-label" x="295" y="110">2B</text>
+              <text class="lot-label" x="110" y="260">3C</text>
+            </svg>
+          </div>
+
+          <div id="i-folder" class="item folder" data-layout-ignore>
+            <svg viewBox="0 0 340 260">
+              <path d="M10 40 L120 40 L145 70 L330 70 L330 250 L10 250 Z" fill="#d3b73b" />
+              <path d="M10 90 L330 90 L330 250 L10 250 Z" fill="#ffc600" />
+              <text class="folder-label" x="170" y="185" text-anchor="middle">INFORMES</text>
+            </svg>
+          </div>
+
+          <div id="i-tractor" class="item tractor">
+            <svg viewBox="0 0 360 220">
+              <g fill="#c9c4b6">
+                <path d="M120 30 L210 30 L220 110 L300 110 L320 140 L320 160 L110 160 L110 120 Z" />
+                <rect x="40" y="110" width="80" height="40" />
+                <rect x="250" y="70" width="10" height="44" />
+              </g>
+              <rect x="135" y="45" width="60" height="55" fill="#0b0b0b" />
+              <circle cx="120" cy="160" r="56" fill="#c9c4b6" /><circle cx="120" cy="160" r="22" fill="#0b0b0b" />
+              <circle cx="285" cy="178" r="34" fill="#c9c4b6" /><circle cx="285" cy="178" r="13" fill="#0b0b0b" />
+            </svg>
+          </div>
+
+          <div id="i-chat2" class="item chat">
+            <svg class="ico" viewBox="0 0 58 58"><circle cx="29" cy="29" r="26" fill="none" stroke="#7db35a" stroke-width="3" /><circle cx="29" cy="23" r="8" fill="#7db35a" /><path d="M14 46 q15 -16 30 0" fill="none" stroke="#7db35a" stroke-width="4" /></svg>
+            <span>¿Mandaste el informe?</span>
+          </div>
+
+          <div id="i-chat3" class="item chat">
+            <svg class="ico" viewBox="0 0 58 58"><circle cx="29" cy="29" r="26" fill="none" stroke="#7db35a" stroke-width="3" /><circle cx="29" cy="23" r="8" fill="#7db35a" /><path d="M14 46 q15 -16 30 0" fill="none" stroke="#7db35a" stroke-width="4" /></svg>
+            <span>Va la planilla nueva</span>
+          </div>
+
+          <div id="i-paper2" class="item paper">
+            <svg class="ink" viewBox="0 0 300 390">
+              <path d="M34 60 q20 -8 40 0 t40 0 t40 0 t40 0" />
+              <path d="M34 110 q18 -7 36 0 t36 0 t36 0 t36 0 t36 0" />
+              <path d="M34 160 q20 -8 40 0 t40 0 t40 0" />
+              <path d="M34 210 q18 -7 36 0 t36 0 t36 0 t36 0" />
+              <path d="M34 260 q20 -8 40 0 t40 0 t40 0 t40 0" />
+              <path d="M34 310 q18 -7 36 0 t36 0" />
+            </svg>
+          </div>
+        </div>
+
+        <div id="counter" class="abs">
+          <div><b>5</b> herramientas</div>
+          <div><b>5</b> suscripciones</div>
+          <div>datos pasados <b>a mano</b></div>
+        </div>
+        <div id="freeze-dim" class="layer"></div>
+      </section>
+
+      <!-- ESCENA 3 · 16–22 s · pausa -->
+      <section id="s3" class="scene clip" data-start="16" data-duration="6.5" data-track-index="3">
+        <div id="s3-box" class="abs">
+          <h2 id="s3-title" class="title" data-hold>
+            <span class="word">¿Y</span> <span class="word">si</span> <span class="word">todo</span>
+            <span class="word">estuviera</span> <span class="word">en</span><br />
+            <span class="word accent">un solo lugar?</span>
+          </h2>
+        </div>
+      </section>
+
+      <!-- ESCENA 4 · 22–34 s · convergencia en la plataforma -->
+      <section id="s4" class="scene clip" data-start="21.9" data-duration="12.4" data-track-index="4">
+        <div id="dash" class="abs" data-layout-ignore>
+          <div class="dash-head">
+            <svg class="logo" viewBox="0 0 46 46"><circle cx="23" cy="23" r="20" fill="none" stroke="#ffc600" stroke-width="3" /><path d="M9 25 q7 -7 14 0 t14 0" fill="none" stroke="#ffc600" stroke-width="3" stroke-linecap="round" /></svg>
+            <span>PANEL DE LA CONSULTORA</span>
+          </div>
+          <div class="dash-grid">
+            <div id="w0" class="widget">
+              <div class="w-title">RECORRIDAS</div>
+              <div class="row"><span class="dot"></span>3C · roya 20%<span class="pill gold">HOY</span></div>
+              <div class="row"><span class="dot"></span>2B · malezas<span class="pill">AYER</span></div>
+              <div class="row"><span class="dot"></span>1A · sin novedad<span class="pill">LUN</span></div>
+            </div>
+            <div id="w1" class="widget">
+              <div class="w-title">CLIENTES</div>
+              <div class="row">La Esperanza<span class="pill">12 lotes</span></div>
+              <div class="row">Santa Clara<span class="pill">8 lotes</span></div>
+              <div class="row">El Molino<span class="pill">5 lotes</span></div>
+            </div>
+            <div id="w2" class="widget">
+              <div class="w-title">MAPA DE LOTES</div>
+              <div class="w-body">
+                <svg viewBox="0 0 460 200" preserveAspectRatio="xMidYMid meet">
+                  <g stroke="#1c1c19" stroke-width="4">
+                    <path d="M10 10 L150 6 L160 100 L14 110 Z" fill="#7db35a" />
+                    <path d="M150 6 L300 14 L296 96 L160 100 Z" fill="#ffc600" />
+                    <path d="M300 14 L450 10 L446 104 L296 96 Z" fill="#4f7a39" />
+                    <path d="M14 110 L160 100 L170 192 L18 196 Z" fill="#d3b73b" />
+                    <path d="M160 100 L446 104 L450 194 L170 192 Z" fill="#7db35a" />
+                  </g>
+                  <text class="lot-label" x="58" y="68">1A</text>
+                  <text class="lot-label" x="204" y="66">2B</text>
+                  <text class="lot-label" x="350" y="66">3C</text>
+                </svg>
+              </div>
+            </div>
+            <div id="w3" class="widget">
+              <div class="w-title">INFORME</div>
+              <div class="inf-head">
+                <svg class="logo" viewBox="0 0 46 46"><circle cx="23" cy="23" r="20" fill="none" stroke="#ffc600" stroke-width="3" /><path d="M9 25 q7 -7 14 0 t14 0" fill="none" stroke="#ffc600" stroke-width="3" stroke-linecap="round" /></svg>
+                <span>Informe técnico</span>
+              </div>
+              <div class="inf-sub">La Esperanza · Lote 3C</div>
+              <div class="doc-line" style="width: 92%"></div>
+              <div class="doc-line" style="width: 78%"></div>
+              <div class="doc-line" style="width: 64%"></div>
+            </div>
+          </div>
+        </div>
+        <div id="s4-text" class="abs title" data-hold>
+          <span class="word">Toda</span> <span class="word">la</span> <span class="word">información</span>
+          <span class="word">del</span> <span class="word">campo</span><br />
+          <span class="word">en</span> <span class="word">una</span> <span class="word gold">plataforma</span>
+        </div>
+      </section>
+
+      <!-- ESCENA 5 · 34–46 s · dos accesos -->
+      <section id="s5" data-hold class="scene clip" data-start="33.9" data-duration="12.6" data-track-index="5">
+        <div id="laptop" class="abs" data-layout-ignore>
+          <div class="laptop-screen">
+            <div class="dash-head">
+              <svg class="logo" viewBox="0 0 46 46"><circle cx="23" cy="23" r="20" fill="none" stroke="#ffc600" stroke-width="3" /><path d="M9 25 q7 -7 14 0 t14 0" fill="none" stroke="#ffc600" stroke-width="3" stroke-linecap="round" /></svg>
+              <span>TU CONSULTORA</span>
+            </div>
+            <div class="screen-cols">
+              <div>
+                <div class="w-title">CLIENTES</div>
+                <div class="row lap-row hl">La Esperanza<span class="pill">12 lotes</span></div>
+                <div class="row lap-row hl">Santa Clara<span class="pill">8 lotes</span></div>
+                <div class="row lap-row hl">El Molino<span class="pill">5 lotes</span></div>
+              </div>
+              <div class="widget lap-doc" style="opacity: 1">
+                <div class="inf-head">
+                  <svg class="logo" viewBox="0 0 46 46"><circle cx="23" cy="23" r="20" fill="none" stroke="#ffc600" stroke-width="3" /><path d="M9 25 q7 -7 14 0 t14 0" fill="none" stroke="#ffc600" stroke-width="3" stroke-linecap="round" /></svg>
+                  <span>Tu marca</span>
+                </div>
+                <div class="inf-sub">Informe · Lote 3C</div>
+                <div class="doc-line" style="width: 92%"></div>
+                <div class="doc-line" style="width: 76%"></div>
+                <div class="doc-line" style="width: 84%"></div>
+                <div class="doc-line" style="width: 58%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="laptop-base"></div>
+        </div>
+
+        <div id="phone" class="abs phone" data-layout-ignore>
+          <div class="screen-pad">
+            <div class="w-title" style="margin-top: 0">MIS CAMPOS</div>
+            <div class="phone-field">La Esperanza</div>
+            <div class="row ph-row"><span class="dot"></span>Lote 1A<span class="pill">OK</span></div>
+            <div class="row ph-row"><span class="dot" style="background: #ffc600"></span>Lote 2B<span class="pill gold">VER</span></div>
+            <div class="row ph-row"><span class="dot"></span>Lote 3C<span class="pill">OK</span></div>
+            <div class="w-title">HISTORIAL</div>
+            <div class="row ph-row">12/10 · siembra</div>
+            <div class="row ph-row">03/11 · roya 20%</div>
+            <div class="row ph-row">08/11 · informe</div>
+          </div>
+        </div>
+
+        <div id="lab-a" class="abs label">La consultora <span class="gold">gestiona</span></div>
+        <div id="lab-b" class="abs label">El productor consulta, <span class="gold">gratis</span></div>
+      </section>
+
+      <!-- ESCENA 6 · 46–54 s · beneficios -->
+      <section id="s6" data-hold class="scene clip" data-start="45.7" data-duration="8.6" data-track-index="6">
+        <div id="k0" class="abs card">
+          <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="44" /><path d="M60 32 V60 L80 72" /><path d="M14 40 L16 60 L34 52" /></svg>
+          <div class="ctext">Historial auditable por lote</div>
+        </div>
+        <div id="k1" class="abs card">
+          <svg viewBox="0 0 120 120"><rect x="26" y="12" width="68" height="96" rx="8" /><line x1="40" y1="38" x2="80" y2="38" /><line x1="40" y1="58" x2="80" y2="58" /><line x1="40" y1="78" x2="66" y2="78" /></svg>
+          <div class="ctext">Informes a tu medida</div>
+        </div>
+        <div id="k2" class="abs card">
+          <svg viewBox="0 0 120 120"><path d="M14 104 H108 M14 104 V14" /><path id="k2-curve" d="M20 96 C 44 92, 52 62, 68 48 S 94 24, 106 22" /></svg>
+          <div class="ctext">Estimación de cosecha</div>
+        </div>
+        <div id="k3" class="abs card">
+          <svg viewBox="0 0 120 120"><line x1="22" y1="96" x2="22" y2="84" /><line x1="44" y1="96" x2="44" y2="70" /><line x1="66" y1="96" x2="66" y2="54" /><line x1="88" y1="96" x2="88" y2="36" /><line x1="14" y1="20" x2="104" y2="106" /></svg>
+          <div class="ctext">Funciona sin señal</div>
+        </div>
+      </section>
+
+      <!-- ESCENA 7 · 54–60 s · cierre -->
+      <section id="s7" class="scene clip" data-start="53.9" data-duration="6.1" data-track-index="7">
+        <div id="s7-box" class="abs">
+          <h2 id="s7-title" class="title">
+            <span class="word">Web</span> <span class="word">Experience</span><br class="pbr" /> <span class="word gold">y</span> <span class="word">CAI</span>
+          </h2>
+          <div id="s7-sub">Ayudanos a construirla</div>
+          <div id="cta-btn">Completá la encuesta</div>
+          <div id="s7-url" class="muted">encuestas.webexperiencepro.com</div>
+        </div>
+      </section>
+
+      <!-- Transición: cortina con borde de onda dorada -->
+      <div id="wipe" class="layer clip" data-start="0" data-duration="60" data-track-index="8" data-layout-ignore>
+        <div id="wipe-mover"><svg id="wipe-svg"></svg></div>
+      </div>
+    </div>
+    <script src="assets/reel.js"></script>
+  </body>
+</html>
