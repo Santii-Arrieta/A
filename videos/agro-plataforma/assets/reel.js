@@ -347,23 +347,86 @@
   });
   tl.to("#s5", { opacity: 0, duration: 0.5, ease: OUT }, 45.8);
 
-  /* ESCENA 6 · 46–54 · beneficios */
+  /* ESCENA 6 · 46–54 · beneficios — cada ícono tiene su propia animación */
   show("#s6", 46.2);
   tl.fromTo(".card", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.7, ease: IN, stagger: 0.12 }, 46.3);
-  const curve = $("#k2-curve");
-  const cl = curve.getTotalLength();
-  curve.style.strokeDasharray = cl;
-  curve.style.strokeDashoffset = cl;
-  tl.to(curve, { strokeDashoffset: 0, duration: 1.4, ease: "power2.inOut" }, 47.2);
+  function prepDraw(sel) {
+    $$(sel).forEach((el) => {
+      const L = el.getTotalLength();
+      el.style.strokeDasharray = L;
+      el.style.strokeDashoffset = L;
+    });
+  }
+  function draw(sel, t, d, stagger = 0) {
+    prepDraw(sel);
+    tl.to(sel, { strokeDashoffset: 0, duration: d, ease: "power2.inOut", stagger }, t);
+  }
+  // k0 · historial: se dibuja el reloj, la flecha de "volver atrás" y las agujas giran hacia atrás
+  draw("#k0-face", 46.6, 0.8);
+  draw("#k0-arrow", 47.1, 0.45);
+  tl.fromTo(["#k0-min", "#k0-hr"], { opacity: 0 }, { opacity: 1, duration: 0.3, ease: IN }, 47.0);
+  tl.fromTo("#k0-min", { rotation: 0 }, { rotation: -360, svgOrigin: "60 60", duration: 1.4, ease: "power2.inOut" }, 47.2);
+  tl.fromTo("#k0-hr", { rotation: 0 }, { rotation: -30, svgOrigin: "60 60", duration: 1.4, ease: "power2.inOut" }, 47.2);
+  tl.to("#k0-min", { rotation: -450, svgOrigin: "60 60", duration: 5.0, ease: "none" }, 48.6);
+  // k1 · informes: la hoja se dibuja y las líneas se escriben
+  draw("#k1-doc", 46.7, 0.8);
+  draw(".k1-line", 47.3, 0.4, 0.25);
+  tl.set("#k1-l3", { strokeDasharray: "none" }, 48.4);
+  tl.to("#k1-l3", { attr: { x2: 80 }, duration: 0.6, ease: "power2.inOut" }, 49.6);
+  // k2 · cosecha: ejes, curva y un punto que la recorre
+  draw("#k2-axes", 46.8, 0.6);
+  draw("#k2-curve", 47.2, 1.4);
+  const k2c = $("#k2-curve");
+  const k2d = $("#k2-dot");
+  const k2L = k2c.getTotalLength();
+  const ride = { p: 0 };
+  tl.fromTo(k2d, { opacity: 0 }, { opacity: 1, duration: 0.2, ease: IN }, 47.2);
+  tl.fromTo(
+    ride,
+    { p: 0 },
+    {
+      p: 1,
+      duration: 1.4,
+      ease: "power2.inOut",
+      onUpdate: () => {
+        const pt = k2c.getPointAtLength(ride.p * k2L);
+        k2d.setAttribute("cx", pt.x.toFixed(2));
+        k2d.setAttribute("cy", pt.y.toFixed(2));
+      },
+    },
+    47.2
+  );
+  [49.4, 51.4].forEach((t) => {
+    tl.to(k2d, { attr: { r: 11 }, duration: 0.3, ease: "power2.out" }, t);
+    tl.to(k2d, { attr: { r: 7 }, duration: 0.4, ease: "power2.in" }, t + 0.3);
+  });
+  // k3 · sin señal: suben las barras, se apagan, se tacha la señal y vuelven
+  tl.fromTo(".k3-bar", { scaleY: 0 }, { scaleY: 1, transformOrigin: "50% 100%", duration: 0.4, ease: IN, stagger: 0.12 }, 47.0);
+  tl.to(".k3-bar", { opacity: 0.35, duration: 0.4, ease: OUT, stagger: { each: 0.1, from: "end" } }, 48.3);
+  draw("#k3-slash", 48.8, 0.5);
+  tl.to(".k3-bar", { opacity: 1, duration: 0.5, ease: IN, stagger: 0.1 }, 50.6);
   wipe(54.0);
   hide("#s6", 54.0);
 
-  /* ESCENA 7 · 54–60 · cierre (quieto desde 58 s) */
+  /* ESCENA 5 · el lote 2B pide atención en el celular */
+  [38.6, 41.6].forEach((t) => {
+    tl.to("#ph-dot2", { scale: 1.7, duration: 0.3, ease: "power2.out" }, t);
+    tl.to("#ph-dot2", { scale: 1, duration: 0.4, ease: "power2.in" }, t + 0.3);
+  });
+
+  /* ESCENA 7 · 54–60 · cierre con logos y QR (quieto desde 57,8 s) */
   show("#s7", 54.0);
-  words("#s7-title .word", 54.3, 0.1);
-  tl.fromTo("#s7-sub", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: IN }, 55.0);
-  tl.fromTo("#cta-btn", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.6, ease: IN }, 55.6);
-  tl.fromTo("#s7-url", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6, ease: IN }, 56.2);
+  tl.fromTo("#logo-we", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.9, ease: "power2.inOut" }, 54.3);
+  tl.fromTo("#logo-div", { scaleY: 0 }, { scaleY: 1, duration: 0.4, ease: IN }, 54.6);
+  tl.fromTo("#logo-cai", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.6, ease: IN }, 54.7);
+  words("#s7-title .word", 55.0, 0.1);
+  tl.fromTo("#s7-sub", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: IN }, 55.5);
+  tl.fromTo("#qr-card", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.6, ease: IN }, 55.3);
+  tl.fromTo("#qr-scan", { opacity: 0 }, { opacity: 1, duration: 0.1, ease: "none" }, 55.9);
+  tl.to("#qr-scan", { y: 440, duration: 0.8, ease: "power1.inOut" }, 55.9);
+  tl.to("#qr-scan", { opacity: 0, duration: 0.2, ease: OUT }, 56.6);
+  tl.fromTo("#cta-btn", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: IN }, 56.0);
+  tl.fromTo("#s7-url", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6, ease: IN }, 56.3);
 
   window.__timelines = window.__timelines || {};
   window.__timelines["main"] = tl;

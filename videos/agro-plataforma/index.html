@@ -163,7 +163,7 @@
       <section id="s4" class="scene clip" data-start="21.9" data-duration="12.4" data-track-index="4">
         <div id="dash" class="abs" data-layout-ignore>
           <div class="dash-head">
-            <svg class="logo" viewBox="0 0 46 46"><circle cx="23" cy="23" r="20" fill="none" stroke="#ffc600" stroke-width="3" /><path d="M9 25 q7 -7 14 0 t14 0" fill="none" stroke="#ffc600" stroke-width="3" stroke-linecap="round" /></svg>
+            <img class="logo-img" src="assets/logos/webexperience-infinito.png" alt="Web Experience" />
             <span>PANEL DE LA CONSULTORA</span>
           </div>
           <div class="dash-grid">
@@ -252,7 +252,7 @@
             <div class="w-title" style="margin-top: 0">MIS CAMPOS</div>
             <div class="phone-field">La Esperanza</div>
             <div class="row ph-row"><span class="dot"></span>Lote 1A<span class="pill">OK</span></div>
-            <div class="row ph-row"><span class="dot" style="background: #ffc600"></span>Lote 2B<span class="pill gold">VER</span></div>
+            <div class="row ph-row"><span id="ph-dot2" class="dot" style="background: #ffc600"></span>Lote 2B<span class="pill gold">VER</span></div>
             <div class="row ph-row"><span class="dot"></span>Lote 3C<span class="pill">OK</span></div>
             <div class="w-title">HISTORIAL</div>
             <div class="row ph-row">12/10 · siembra</div>
@@ -265,36 +265,68 @@
         <div id="lab-b" class="abs label">El productor consulta, <span class="gold">gratis</span></div>
       </section>
 
-      <!-- ESCENA 6 · 46–54 s · beneficios -->
+      <!-- ESCENA 6 · 46–54 s · beneficios (íconos animados en assets/reel.js) -->
       <section id="s6" data-hold class="scene clip" data-start="45.7" data-duration="8.6" data-track-index="6">
         <div id="k0" class="abs card">
-          <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="44" /><path d="M60 32 V60 L80 72" /><path d="M14 40 L16 60 L34 52" /></svg>
+          <svg viewBox="0 0 120 120">
+            <circle id="k0-face" cx="60" cy="60" r="44" />
+            <line id="k0-min" x1="60" y1="60" x2="60" y2="30" />
+            <line id="k0-hr" x1="60" y1="60" x2="78" y2="70" />
+            <path id="k0-arrow" d="M14 40 L16 60 L34 52" />
+          </svg>
           <div class="ctext">Historial auditable por lote</div>
         </div>
         <div id="k1" class="abs card">
-          <svg viewBox="0 0 120 120"><rect x="26" y="12" width="68" height="96" rx="8" /><line x1="40" y1="38" x2="80" y2="38" /><line x1="40" y1="58" x2="80" y2="58" /><line x1="40" y1="78" x2="66" y2="78" /></svg>
+          <svg viewBox="0 0 120 120">
+            <rect id="k1-doc" x="26" y="12" width="68" height="96" rx="8" />
+            <line class="k1-line" x1="40" y1="38" x2="80" y2="38" />
+            <line class="k1-line" x1="40" y1="58" x2="80" y2="58" />
+            <line class="k1-line" id="k1-l3" x1="40" y1="78" x2="66" y2="78" />
+          </svg>
           <div class="ctext">Informes a tu medida</div>
         </div>
         <div id="k2" class="abs card">
-          <svg viewBox="0 0 120 120"><path d="M14 104 H108 M14 104 V14" /><path id="k2-curve" d="M20 96 C 44 92, 52 62, 68 48 S 94 24, 106 22" /></svg>
+          <svg viewBox="0 0 120 120">
+            <path id="k2-axes" d="M14 14 V104 H108" />
+            <path id="k2-curve" d="M20 96 C 44 92, 52 62, 68 48 S 94 24, 106 22" />
+            <circle id="k2-dot" cx="20" cy="96" r="7" style="fill: #ffc600; stroke: none" />
+          </svg>
           <div class="ctext">Estimación de cosecha</div>
         </div>
         <div id="k3" class="abs card">
-          <svg viewBox="0 0 120 120"><line x1="22" y1="96" x2="22" y2="84" /><line x1="44" y1="96" x2="44" y2="70" /><line x1="66" y1="96" x2="66" y2="54" /><line x1="88" y1="96" x2="88" y2="36" /><line x1="14" y1="20" x2="104" y2="106" /></svg>
+          <svg viewBox="0 0 120 120">
+            <line class="k3-bar" x1="22" y1="96" x2="22" y2="84" />
+            <line class="k3-bar" x1="44" y1="96" x2="44" y2="70" />
+            <line class="k3-bar" x1="66" y1="96" x2="66" y2="54" />
+            <line class="k3-bar" x1="88" y1="96" x2="88" y2="36" />
+            <line id="k3-slash" x1="14" y1="20" x2="104" y2="106" />
+          </svg>
           <div class="ctext">Funciona sin señal</div>
         </div>
       </section>
 
-      <!-- ESCENA 7 · 54–60 s · cierre -->
+      <!-- ESCENA 7 · 54–60 s · cierre con logos y QR -->
       <section id="s7" class="scene clip" data-start="53.9" data-duration="6.1" data-track-index="7">
         <div id="s7-box" class="abs">
+          <div id="s7-logos">
+            <img id="logo-we" src="assets/logos/webexperience-infinito.png" alt="Web Experience" />
+            <div id="logo-div"></div>
+            <img id="logo-cai" src="assets/logos/cai.png" alt="CAI" />
+          </div>
           <h2 id="s7-title" class="title">
             <span class="word">Web</span> <span class="word">Experience</span><br class="pbr" /> <span class="word gold">y</span> <span class="word">CAI</span>
           </h2>
           <div id="s7-sub">Ayudanos a construirla</div>
-          <div id="cta-btn">Completá la encuesta</div>
-          <div id="s7-url" class="muted">encuestas.webexperiencepro.com</div>
         </div>
+        <div id="s7-qr" class="abs">
+          <!-- El QR se genera con scripts/make_qr.py (destino: encuestas.webexperiencepro.com/asesores) -->
+          <div id="qr-card">
+            <img id="qr-img" src="assets/qr-encuesta.svg" alt="QR de la encuesta" />
+            <div id="qr-scan"></div>
+          </div>
+          <div id="cta-btn">Completá la encuesta</div>
+        </div>
+        <div id="s7-url" class="abs muted">encuestas.webexperiencepro.com/asesores</div>
       </section>
 
       <!-- Transición: cortina con borde de onda dorada -->

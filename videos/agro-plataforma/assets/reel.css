@@ -309,7 +309,7 @@ body {
   border: 2px solid #3a3a33;
   border-top: 6px solid #ffc600;
   border-radius: 20px;
-  padding: 40px 36px;
+  padding: 44px 42px;
   opacity: 0;
 }
 .card svg {
@@ -318,7 +318,7 @@ body {
   margin-bottom: 30px;
 }
 .card .ctext {
-  font-size: 50px;
+  font-size: 48px;
   font-weight: 900;
   line-height: 1.12;
 }
@@ -420,56 +420,60 @@ body {
   left: 1300px;
   top: 110px;
   width: 360px;
-  height: 680px;
+  height: 590px;
 }
 .land #lab-a {
   left: 120px;
-  top: 820px;
+  top: 790px;
   width: 920px;
 }
 .land #lab-b {
   left: 1100px;
-  top: 820px;
+  top: 790px;
   width: 760px;
 }
 .land .card {
   top: 300px;
-  width: 400px;
-  height: 450px;
+  width: 410px;
+  height: 460px;
 }
 .land #k0 {
-  left: 120px;
+  left: 86px;
 }
 .land #k1 {
-  left: 560px;
+  left: 532px;
 }
 .land #k2 {
-  left: 1000px;
+  left: 978px;
 }
 .land #k3 {
-  left: 1440px;
+  left: 1424px;
 }
 .land #s7-box {
-  left: 0;
-  right: 0;
-  top: 200px;
+  left: 80px;
+  width: 1080px;
+  top: 250px;
   text-align: center;
 }
 .land #s7-title {
-  font-size: 110px;
+  font-size: 80px;
+  white-space: nowrap;
 }
 .land #s7-sub {
   font-size: 60px;
   margin-top: 24px;
 }
-.land #cta-btn {
-  margin-top: 70px;
-  padding: 34px 80px;
-  font-size: 58px;
+.land #s7-qr {
+  left: 1200px;
+  width: 620px;
+  top: 200px;
 }
 .land #s7-url {
-  font-size: 52px;
-  margin-top: 40px;
+  left: 80px;
+  width: 1080px;
+  top: 690px;
+  text-align: center;
+  font-size: 40px;
 }
 
 /* ═════════ 9:16 ═════════ */
@@ -532,7 +536,7 @@ body {
 .port #lab-a {
   left: 60px;
   right: 60px;
-  top: 800px;
+  top: 830px;
 }
 .port #lab-b {
   left: 60px;
@@ -562,7 +566,7 @@ body {
 .port #s7-box {
   left: 60px;
   right: 60px;
-  top: 560px;
+  top: 250px;
   text-align: center;
 }
 .port #s7-title {
@@ -572,14 +576,17 @@ body {
   font-size: 60px;
   margin-top: 30px;
 }
-.port #cta-btn {
-  margin-top: 90px;
-  padding: 34px 60px;
-  font-size: 54px;
+.port #s7-qr {
+  left: 230px;
+  width: 620px;
+  top: 820px;
 }
 .port #s7-url {
-  font-size: 50px;
-  margin-top: 46px;
+  left: 40px;
+  right: 40px;
+  top: 1490px;
+  text-align: center;
+  font-size: 38px;
 }
 
 /* ── detalles de mockups ── */
@@ -653,8 +660,71 @@ body {
   padding: 0 10px;
 }
 .port .card {
-  padding: 40px 34px;
+  padding: 44px 40px;
 }
 .land .pbr {
   display: none;
+}
+
+/* ── cierre: logos + QR ── */
+#s7-logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 44px;
+  margin-bottom: 44px;
+}
+#logo-we {
+  height: 140px;
+  width: auto;
+}
+#logo-div {
+  width: 3px;
+  height: 120px;
+  background: #d3b73b;
+}
+#logo-cai {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+}
+#s7-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#qr-card {
+  position: relative;
+  width: 460px;
+  height: 460px;
+  padding: 18px;
+  background: #f4f1e8;
+  border-radius: 24px;
+  border: 4px solid #ffc600;
+  overflow: hidden;
+  box-shadow: 0 0 50px rgba(255, 198, 0, 0.25);
+}
+#qr-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+#qr-scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 10px;
+  background: linear-gradient(90deg, rgba(255, 198, 0, 0), #ffc600, rgba(255, 198, 0, 0));
+  opacity: 0;
+}
+#s7-qr #cta-btn {
+  margin-top: 34px;
+  padding: 24px 44px;
+  font-size: 42px;
+  white-space: nowrap;
+}
+.dash-head .logo-img {
+  height: 40px;
+  width: auto;
 }
