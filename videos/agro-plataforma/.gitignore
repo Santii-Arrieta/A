@@ -1,3 +1,9 @@
 renders/
 snapshots/
 .hyperframes/
+
+# Música licenciada de Envato Elements: no se sube al repositorio (licencia por proyecto, no redistribuible)
+assets/audio/envato/
+assets/audio/agro-musica-envato.wav
+vertical/assets/audio/envato/
+vertical/assets/audio/agro-musica-envato.wav
